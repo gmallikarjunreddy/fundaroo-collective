@@ -48,6 +48,11 @@ const Footer = () => {
               <h3 className="font-medium mb-4">About</h3>
               <ul className="space-y-3">
                 <li>
+                  <Link to="/how-it-works" className="text-muted-foreground hover:text-foreground transition-colors">
+                    How It Works
+                  </Link>
+                </li>
+                <li>
                   <Link to="/about" className="text-muted-foreground hover:text-foreground transition-colors">
                     About Us
                   </Link>
@@ -55,11 +60,6 @@ const Footer = () => {
                 <li>
                   <Link to="/careers" className="text-muted-foreground hover:text-foreground transition-colors">
                     Careers
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/press" className="text-muted-foreground hover:text-foreground transition-colors">
-                    Press
                   </Link>
                 </li>
                 <li>
@@ -84,7 +84,7 @@ const Footer = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/creator-resources" className="text-muted-foreground hover:text-foreground transition-colors">
+                  <Link to="/start-project" className="text-muted-foreground hover:text-foreground transition-colors">
                     Creator Resources
                   </Link>
                 </li>
