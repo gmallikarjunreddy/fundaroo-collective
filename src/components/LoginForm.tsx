@@ -38,17 +38,42 @@ const LoginForm = () => {
 
     setIsLoading(true);
 
-    // Simulate API request
-    setTimeout(() => {
-      setIsLoading(false);
-      
-      // For demo purposes, let any login succeed
+    try {
+      const response = await fetch('http://localhost:5000/api/users/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to login');
+      }
+
+      // Save user data to localStorage
+      localStorage.setItem('userInfo', JSON.stringify(data));
+
       toast({
         title: "Login successful!",
         description: "Welcome back to Fundaroo.",
       });
+      
       navigate('/dashboard');
-    }, 1500);
+    } catch (error) {
+      toast({
+        title: "Login Failed",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

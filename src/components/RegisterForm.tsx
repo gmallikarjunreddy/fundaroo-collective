@@ -58,15 +58,40 @@ const RegisterForm = () => {
 
     setIsLoading(true);
 
-    // Simulate API request
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const response = await fetch('http://localhost:5000/api/users/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fullName: formData.fullName,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Registration failed');
+      }
+
       toast({
         title: "Account created!",
         description: "Welcome to Fundaroo. You can now log in.",
       });
+      
       navigate('/login');
-    }, 1500);
+    } catch (error) {
+      toast({
+        title: "Registration Failed",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
