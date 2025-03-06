@@ -4,16 +4,16 @@ import { useEffect, useRef } from 'react';
 interface ProjectProgressProps {
   raised: number;
   goal: number;
-  backers: number;
-  daysLeft: number;
+  backers?: number;
+  daysLeft?: number;
   className?: string;
 }
 
 const ProjectProgress = ({ 
   raised, 
   goal, 
-  backers, 
-  daysLeft, 
+  backers = 0, 
+  daysLeft = 0, 
   className = ""
 }: ProjectProgressProps) => {
   const progressRef = useRef<HTMLDivElement>(null);
@@ -50,16 +50,22 @@ const ProjectProgress = ({
         role="progressbar"
       ></div>
       
-      <div className="grid grid-cols-2 gap-4 mt-6">
-        <div className="p-4 bg-secondary/50 rounded-lg">
-          <p className="text-2xl font-medium">{backers.toLocaleString()}</p>
-          <p className="text-muted-foreground text-sm mt-1">backers</p>
+      {(backers !== undefined || daysLeft !== undefined) && (
+        <div className="grid grid-cols-2 gap-4 mt-6">
+          {backers !== undefined && (
+            <div className="p-4 bg-secondary/50 rounded-lg">
+              <p className="text-2xl font-medium">{backers.toLocaleString()}</p>
+              <p className="text-muted-foreground text-sm mt-1">backers</p>
+            </div>
+          )}
+          {daysLeft !== undefined && (
+            <div className="p-4 bg-secondary/50 rounded-lg">
+              <p className="text-2xl font-medium">{daysLeft}</p>
+              <p className="text-muted-foreground text-sm mt-1">days to go</p>
+            </div>
+          )}
         </div>
-        <div className="p-4 bg-secondary/50 rounded-lg">
-          <p className="text-2xl font-medium">{daysLeft}</p>
-          <p className="text-muted-foreground text-sm mt-1">days to go</p>
-        </div>
-      </div>
+      )}
     </div>
   );
 };
