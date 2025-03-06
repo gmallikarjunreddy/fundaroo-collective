@@ -47,6 +47,15 @@ const RegisterForm = () => {
       return;
     }
 
+    if (formData.password.length < 8) {
+      toast({
+        title: "Password Too Short",
+        description: "Your password must be at least 8 characters long.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     // Simulate API request
@@ -98,6 +107,7 @@ const RegisterForm = () => {
             value={formData.password}
             onChange={handleChange}
             required
+            minLength={8}
           />
           <Button
             type="button"
@@ -110,6 +120,7 @@ const RegisterForm = () => {
             <span className="sr-only">{showPassword ? "Hide password" : "Show password"}</span>
           </Button>
         </div>
+        <p className="text-xs text-muted-foreground mt-1">Must be at least 8 characters</p>
       </div>
       
       <div className="space-y-2">

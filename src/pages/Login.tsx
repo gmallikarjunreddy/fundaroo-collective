@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -10,6 +10,7 @@ import RegisterForm from '@/components/RegisterForm';
 
 const Login = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<string>("login");
   
   useEffect(() => {
@@ -23,6 +24,12 @@ const Login = () => {
     }
   }, [location.pathname]);
 
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    // Update the URL based on the selected tab
+    navigate(value === "register" ? "/register" : "/login");
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -33,7 +40,7 @@ const Login = () => {
             <Tabs 
               defaultValue={activeTab} 
               value={activeTab} 
-              onValueChange={setActiveTab}
+              onValueChange={handleTabChange}
               className="w-full"
             >
               <TabsList className="grid w-full grid-cols-2 mb-8">
