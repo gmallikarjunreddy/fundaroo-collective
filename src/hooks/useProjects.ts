@@ -14,6 +14,10 @@ export const useProjects = () => {
   const { data: projects = [], isLoading, error } = useQuery({
     queryKey: ['projects'],
     queryFn: getAllProjects,
+    retry: 1,
+    onError: (error) => {
+      console.error('Error fetching projects:', error);
+    }
   });
 
   // Filter and sort projects based on activeCategory, searchQuery, and sortBy

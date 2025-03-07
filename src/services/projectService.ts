@@ -13,13 +13,17 @@ export interface ProjectData {
   coverImage?: string;
 }
 
+// API base URL that works for both development and production
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
 // Get all projects
 export const getAllProjects = async () => {
   try {
-    const response = await fetch('http://localhost:5000/api/projects');
+    const response = await fetch(`${API_BASE_URL}/projects`);
     
     if (!response.ok) {
-      throw new Error('Failed to fetch projects');
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Failed to fetch projects');
     }
     
     return await response.json();
@@ -32,10 +36,11 @@ export const getAllProjects = async () => {
 // Get project by ID
 export const getProjectById = async (projectId: string) => {
   try {
-    const response = await fetch(`http://localhost:5000/api/projects/${projectId}`);
+    const response = await fetch(`${API_BASE_URL}/projects/${projectId}`);
     
     if (!response.ok) {
-      throw new Error('Failed to fetch project');
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Failed to fetch project');
     }
     
     return await response.json();
@@ -54,7 +59,8 @@ export const createProject = async (projectData: ProjectData) => {
   }
   
   try {
-    const response = await fetch('http://localhost:5000/api/projects', {
+    console.log('Creating project with data:', projectData);
+    const response = await fetch(`${API_BASE_URL}/projects`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -85,7 +91,7 @@ export const updateProject = async (projectId: string, projectData: Partial<Proj
   }
   
   try {
-    const response = await fetch(`http://localhost:5000/api/projects/${projectId}`, {
+    const response = await fetch(`${API_BASE_URL}/projects/${projectId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -116,7 +122,7 @@ export const deleteProject = async (projectId: string) => {
   }
   
   try {
-    const response = await fetch(`http://localhost:5000/api/projects/${projectId}`, {
+    const response = await fetch(`${API_BASE_URL}/projects/${projectId}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -124,7 +130,7 @@ export const deleteProject = async (projectId: string) => {
     });
     
     if (!response.ok) {
-      const data = await response.json();
+      const data = await response.json().catch(() => ({}));
       throw new Error(data.message || 'Failed to delete project');
     }
     
@@ -144,14 +150,15 @@ export const getUserProjects = async () => {
   }
   
   try {
-    const response = await fetch('http://localhost:5000/api/projects/user', {
+    const response = await fetch(`${API_BASE_URL}/projects/user`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
     });
     
     if (!response.ok) {
-      throw new Error('Failed to fetch user projects');
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Failed to fetch user projects');
     }
     
     return await response.json();

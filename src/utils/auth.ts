@@ -1,6 +1,9 @@
 
 import { toast } from 'sonner';
 
+// API base URL that works for both development and production
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
 // Helper function to get user info from localStorage
 export const getUserInfo = () => {
   const userInfoString = localStorage.getItem('userInfo');
@@ -28,7 +31,7 @@ export const getToken = () => {
 // Login user
 export const loginUser = async (email: string, password: string) => {
   try {
-    const response = await fetch('http://localhost:5000/api/users/login', {
+    const response = await fetch(`${API_BASE_URL}/users/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -54,7 +57,7 @@ export const loginUser = async (email: string, password: string) => {
 // Register user
 export const registerUser = async (userData: { name: string; email: string; password: string }) => {
   try {
-    const response = await fetch('http://localhost:5000/api/users/register', {
+    const response = await fetch(`${API_BASE_URL}/users/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

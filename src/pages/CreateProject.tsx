@@ -82,14 +82,20 @@ const CreateProject = () => {
     setIsLoading(true);
 
     try {
-      await createProject({
+      console.log('Submitting project data:', formData);
+      
+      const projectDataToSubmit = {
         title: formData.title,
         category: formData.category,
         goal: Number(formData.goal),
         duration: Number(formData.duration),
         description: formData.description,
         story: formData.story,
-      });
+        rewards: formData.rewards,
+      };
+      
+      const result = await createProject(projectDataToSubmit);
+      console.log('Project created successfully:', result);
 
       // Clear pending project from localStorage
       localStorage.removeItem('pendingProject');
@@ -102,6 +108,7 @@ const CreateProject = () => {
       // Redirect to projects page
       navigate('/projects');
     } catch (error) {
+      console.error('Error creating project:', error);
       toast.error('Failed to Create Project', {
         description: error instanceof Error ? error.message : 'An unexpected error occurred'
       });
@@ -165,7 +172,10 @@ const CreateProject = () => {
         )}
         
         {currentStep === 3 && (
-          <ProjectRewardsForm />
+          <ProjectRewardsForm 
+            formData={formData}
+            setFormData={setFormData}
+          />
         )}
         
         <div className="flex justify-between mt-8">
