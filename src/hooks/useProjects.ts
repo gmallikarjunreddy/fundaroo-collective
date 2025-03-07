@@ -15,8 +15,10 @@ export const useProjects = () => {
     queryKey: ['projects'],
     queryFn: getAllProjects,
     retry: 1,
-    onError: (error) => {
-      console.error('Error fetching projects:', error);
+    meta: {
+      onError: (error: Error) => {
+        console.error('Error fetching projects:', error);
+      }
     }
   });
 
