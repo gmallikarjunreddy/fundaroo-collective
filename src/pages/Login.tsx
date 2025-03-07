@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -8,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import LoginForm from '@/components/LoginForm';
 import RegisterForm from '@/components/RegisterForm';
 import { toast } from 'sonner';
+import { isAuthenticated } from '@/utils/auth';
 
 const Login = () => {
   const location = useLocation();
@@ -25,8 +25,7 @@ const Login = () => {
     }
 
     // Check if user is already logged in
-    const userInfo = localStorage.getItem('userInfo');
-    if (userInfo) {
+    if (isAuthenticated()) {
       // Check if there's a pending project
       const pendingProject = localStorage.getItem('pendingProject');
       if (pendingProject) {
@@ -34,7 +33,11 @@ const Login = () => {
           description: 'You were redirected to finish your project submission.'
         });
         navigate('/create-project');
+        return;
       }
+      
+      // Otherwise redirect to dashboard
+      navigate('/dashboard');
     }
   }, [location.pathname, navigate]);
 

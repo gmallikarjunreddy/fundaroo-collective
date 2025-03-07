@@ -4,13 +4,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { loginUser } from '@/utils/auth';
 
 const LoginForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const { toast } = useToast();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -28,10 +28,8 @@ const LoginForm = () => {
     
     // Basic validation
     if (!formData.email || !formData.password) {
-      toast({
-        title: "Missing Information",
-        description: "Please enter both email and password.",
-        variant: "destructive"
+      toast.error("Missing Information", {
+        description: "Please enter both email and password."
       });
       return;
     }
@@ -39,47 +37,25 @@ const LoginForm = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/users/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-        }),
-      });
+      await loginUser(formData.email, formData.password);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to login');
-      }
-
-      // Save user data to localStorage
-      localStorage.setItem('userInfo', JSON.stringify(data));
-
-      toast({
-        title: "Login successful!",
-        description: "Welcome back to Fundaroo.",
+      toast.success("Login successful!", {
+        description: "Welcome back to Fundaroo."
       });
       
       // Check if there's a pending project
       const pendingProject = localStorage.getItem('pendingProject');
       if (pendingProject) {
-        toast({
-          title: "Continue creating your project",
-          description: "You'll be redirected to continue your project submission.",
+        toast.info("Continue creating your project", {
+          description: "You'll be redirected to continue your project submission."
         });
         navigate('/create-project');
       } else {
         navigate('/dashboard');
       }
     } catch (error) {
-      toast({
-        title: "Login Failed",
-        description: error instanceof Error ? error.message : "An unexpected error occurred",
-        variant: "destructive"
+      toast.error("Login Failed", {
+        description: error instanceof Error ? error.message : "An unexpected error occurred"
       });
     } finally {
       setIsLoading(false);

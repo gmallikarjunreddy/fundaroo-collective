@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ProjectCard from '@/components/ProjectCard';
@@ -8,97 +8,20 @@ import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, Loader2 } from 'lucide-react';
+import { useProjects } from '@/hooks/useProjects';
 
 const Projects = () => {
-  const [projects, setProjects] = useState([]);
-  const [filteredProjects, setFilteredProjects] = useState([]);
-  const [activeCategory, setActiveCategory] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState('newest');
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    fetchProjects();
-  }, []);
-  
-  const fetchProjects = async () => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      const response = await fetch('http://localhost:5000/api/projects');
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch projects');
-      }
-      
-      const data = await response.json();
-      setProjects(data);
-      setFilteredProjects(data);
-    } catch (error) {
-      console.error('Error fetching projects:', error);
-      setError(error instanceof Error ? error.message : 'An unexpected error occurred');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  useEffect(() => {
-    let result = [...projects];
-    
-    // Filter by category
-    if (activeCategory !== 'all') {
-      result = result.filter(
-        (project) => project.category === activeCategory
-      );
-    }
-    
-    // Filter by search query
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      result = result.filter(
-        (project) =>
-          project.title.toLowerCase().includes(query) ||
-          project.description.toLowerCase().includes(query) ||
-          project.creator?.name?.toLowerCase().includes(query)
-      );
-    }
-    
-    // Sort projects
-    switch (sortBy) {
-      case 'newest':
-        result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        break;
-      case 'endingSoon':
-        result.sort((a, b) => {
-          const endDateA = new Date(a.createdAt);
-          endDateA.setDate(endDateA.getDate() + Number(a.duration));
-          
-          const endDateB = new Date(b.createdAt);
-          endDateB.setDate(endDateB.getDate() + Number(b.duration));
-          
-          return endDateA.getTime() - endDateB.getTime();
-        });
-        break;
-      case 'mostFunded':
-        result.sort((a, b) => {
-          const percentA = a.raised ? (a.raised / a.goal) * 100 : 0;
-          const percentB = b.raised ? (b.raised / b.goal) * 100 : 0;
-          return percentB - percentA;
-        });
-        break;
-      default:
-        break;
-    }
-    
-    setFilteredProjects(result);
-  }, [activeCategory, searchQuery, sortBy, projects]);
-  
-  const handleCategoryChange = (categoryId: string) => {
-    setActiveCategory(categoryId);
-  };
+  const {
+    projects,
+    isLoading,
+    error,
+    activeCategory,
+    setActiveCategory,
+    searchQuery,
+    setSearchQuery,
+    sortBy,
+    setSortBy
+  } = useProjects();
   
   // Calculate days left for a project
   const calculateDaysLeft = (createdAt: string, duration: number) => {
@@ -125,6 +48,10 @@ const Projects = () => {
       goal: project.goal,
       daysLeft: calculateDaysLeft(project.createdAt, project.duration)
     };
+  };
+  
+  const handleCategoryChange = (categoryId: string) => {
+    setActiveCategory(categoryId);
   };
   
   return (
@@ -156,6 +83,7 @@ const Projects = () => {
             <Select 
               defaultValue="newest" 
               onValueChange={setSortBy}
+              value={sortBy}
             >
               <SelectTrigger className="w-full md:w-48">
                 <SelectValue placeholder="Sort by" />
@@ -178,11 +106,11 @@ const Projects = () => {
           ) : error ? (
             <div className="text-center py-16">
               <p className="text-2xl font-medium mb-2">Error loading projects</p>
-              <p className="text-muted-foreground">{error}</p>
+              <p className="text-muted-foreground">{String(error)}</p>
             </div>
-          ) : filteredProjects.length > 0 ? (
+          ) : projects.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredProjects.map((project) => (
+              {projects.map((project) => (
                 <ProjectCard key={project._id} {...formatProjectData(project)} />
               ))}
             </div>
