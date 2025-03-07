@@ -64,7 +64,17 @@ const LoginForm = () => {
         description: "Welcome back to Fundaroo.",
       });
       
-      navigate('/dashboard');
+      // Check if there's a pending project
+      const pendingProject = localStorage.getItem('pendingProject');
+      if (pendingProject) {
+        toast({
+          title: "Continue creating your project",
+          description: "You'll be redirected to continue your project submission.",
+        });
+        navigate('/create-project');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (error) {
       toast({
         title: "Login Failed",

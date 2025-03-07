@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,11 +8,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 
 const CreateProject = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     category: '',
@@ -24,6 +26,14 @@ const CreateProject = () => {
     coverImage: ''
   });
 
+  useEffect(() => {
+    // Check if user is logged in
+    const userInfo = localStorage.getItem('userInfo');
+    if (userInfo) {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -33,21 +43,70 @@ const CreateProject = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Here we would normally send data to the backend
-    console.log('Form submitted:', formData);
-    
-    // Show success toast and redirect
-    toast.success('Project created successfully!', {
-      description: 'Your project has been submitted for review.'
-    });
-    
-    // Redirect to projects page
-    setTimeout(() => {
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      toast.error('Authentication Required', {
+        description: 'Please log in or create an account to submit a project.'
+      });
+      // Save form data in localStorage to preserve it after login
+      localStorage.setItem('pendingProject', JSON.stringify(formData));
+      navigate('/login');
+      return;
+    }
+
+    // Validate form data
+    if (!formData.title || !formData.category || !formData.goal || !formData.description) {
+      toast.error('Missing Information', {
+        description: 'Please fill out all required fields.'
+      });
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+      const token = userInfo.token;
+
+      const response = await fetch('http://localhost:5000/api/projects', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          title: formData.title,
+          category: formData.category,
+          goal: Number(formData.goal),
+          duration: Number(formData.duration),
+          description: formData.description,
+          story: formData.story,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to create project');
+      }
+
+      // Show success toast and redirect
+      toast.success('Project created successfully!', {
+        description: 'Your project has been submitted.'
+      });
+      
+      // Redirect to projects page
       navigate('/projects');
-    }, 2000);
+    } catch (error) {
+      toast.error('Failed to Create Project', {
+        description: error instanceof Error ? error.message : 'An unexpected error occurred'
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const goToStep = (step: number) => {
@@ -144,7 +203,7 @@ const CreateProject = () => {
                 <Label htmlFor="duration">Campaign Duration (days)</Label>
                 <Select 
                   onValueChange={(value) => handleSelectChange('duration', value)}
-                  defaultValue="30"
+                  value={formData.duration}
                 >
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Select duration" />
@@ -221,8 +280,20 @@ const CreateProject = () => {
           
           <Button 
             onClick={() => goToStep(currentStep + 1)}
+            disabled={isLoading}
           >
-            {currentStep === 3 ? 'Submit Project' : 'Next'}
+            {currentStep === 3 ? (
+              isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Submitting...
+                </>
+              ) : (
+                'Submit Project'
+              )
+            ) : (
+              'Next'
+            )}
           </Button>
         </div>
       </div>

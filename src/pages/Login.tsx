@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import LoginForm from '@/components/LoginForm';
 import RegisterForm from '@/components/RegisterForm';
+import { toast } from 'sonner';
 
 const Login = () => {
   const location = useLocation();
@@ -22,7 +23,20 @@ const Login = () => {
     } else {
       setActiveTab("login");
     }
-  }, [location.pathname]);
+
+    // Check if user is already logged in
+    const userInfo = localStorage.getItem('userInfo');
+    if (userInfo) {
+      // Check if there's a pending project
+      const pendingProject = localStorage.getItem('pendingProject');
+      if (pendingProject) {
+        toast.info('Continue creating your project', {
+          description: 'You were redirected to finish your project submission.'
+        });
+        navigate('/create-project');
+      }
+    }
+  }, [location.pathname, navigate]);
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);

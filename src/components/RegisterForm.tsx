@@ -79,8 +79,16 @@ const RegisterForm = () => {
 
       toast({
         title: "Account created!",
-        description: "Welcome to Fundaroo. You can now log in.",
+        description: "Welcome to Fundaroo. Please log in now.",
       });
+      
+      // After registration, check if there's a pending project and prompt them to log in
+      if (localStorage.getItem('pendingProject')) {
+        toast({
+          title: "Project Creation Pending",
+          description: "Please log in to continue creating your project.",
+        });
+      }
       
       navigate('/login');
     } catch (error) {

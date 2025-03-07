@@ -7,138 +7,50 @@ import CategoryFilter from '@/components/CategoryFilter';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search } from 'lucide-react';
-
-// Mock project data
-const allProjects = [
-  {
-    id: '1',
-    title: 'The Minimal Desk Clock: Elegant Simplicity for Your Workspace',
-    creator: 'Thomas Designs',
-    description: 'A beautifully crafted timepiece that combines minimalist aesthetics with precise functionality.',
-    imageSrc: 'https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=800&auto=format&fit=crop',
-    category: 'design',
-    raised: 42000,
-    goal: 50000,
-    daysLeft: 15
-  },
-  {
-    id: '2',
-    title: 'Eco-friendly Backpack: Adventure Sustainably',
-    creator: 'Green Ventures',
-    description: 'A durable backpack made from recycled materials with innovative storage solutions.',
-    imageSrc: 'https://images.unsplash.com/photo-1547949003-9792a18a2601?q=80&w=800&auto=format&fit=crop',
-    category: 'design',
-    raised: 18500,
-    goal: 30000,
-    daysLeft: 24
-  },
-  {
-    id: '3',
-    title: 'Sound Waves: Immersive Audio Headphones',
-    creator: 'Audio Innovations',
-    description: 'Next-generation headphones with spatial audio technology for an unparalleled listening experience.',
-    imageSrc: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=800&auto=format&fit=crop',
-    category: 'tech',
-    raised: 85000,
-    goal: 100000,
-    daysLeft: 10
-  },
-  {
-    id: '4',
-    title: 'Illustrated Urban Fantasy Novel Series',
-    creator: 'Fantasia Publishing',
-    description: 'A richly illustrated series of novels exploring magical realism in contemporary urban settings.',
-    imageSrc: 'https://images.unsplash.com/photo-1476275466078-4007374efbbe?q=80&w=800&auto=format&fit=crop',
-    category: 'publishing',
-    raised: 12000,
-    goal: 20000,
-    daysLeft: 45
-  },
-  {
-    id: '5',
-    title: 'Ceramic Handcrafted Tableware Collection',
-    creator: 'Clay Studios',
-    description: 'Artisan-made ceramic plates, bowls, and mugs with unique glazes and minimalist design.',
-    imageSrc: 'https://images.unsplash.com/photo-1610701596061-2ecf227e85b2?q=80&w=800&auto=format&fit=crop',
-    category: 'art',
-    raised: 28000,
-    goal: 35000,
-    daysLeft: 18
-  },
-  {
-    id: '6',
-    title: 'Indie Rock Album: Urban Echoes',
-    creator: 'The City Sounds',
-    description: 'A debut album exploring themes of city life through indie rock compositions with electronic influences.',
-    imageSrc: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=800&auto=format&fit=crop',
-    category: 'music',
-    raised: 6800,
-    goal: 12000,
-    daysLeft: 30
-  },
-  {
-    id: '7',
-    title: 'Retro Pixel Art Adventure Game',
-    creator: 'Nostalgia Games',
-    description: 'A pixel art adventure game with modern gameplay mechanics and a nostalgic aesthetic.',
-    imageSrc: 'https://images.unsplash.com/photo-1580327344181-c1163234e5a0?q=80&w=800&auto=format&fit=crop',
-    category: 'games',
-    raised: 35000,
-    goal: 60000,
-    daysLeft: 15
-  },
-  {
-    id: '8',
-    title: 'Documentary: The Hidden Rivers',
-    creator: 'Nature Lens Productions',
-    description: 'A documentary exploring the ecological importance of underground river systems worldwide.',
-    imageSrc: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=800&auto=format&fit=crop',
-    category: 'film',
-    raised: 52000,
-    goal: 75000,
-    daysLeft: 12
-  },
-  {
-    id: '9',
-    title: 'Sustainable Food Container System',
-    creator: 'EcoLiving',
-    description: 'Modular food containers made from plant-based materials with innovative sealing technology.',
-    imageSrc: 'https://images.unsplash.com/photo-1610016302534-6f67f1c968d8?q=80&w=800&auto=format&fit=crop',
-    category: 'tech',
-    raised: 18500,
-    goal: 25000,
-    daysLeft: 22
-  },
-  {
-    id: '10',
-    title: 'Minimalist Fountain Pen Collection',
-    creator: 'Script & Stone',
-    description: 'Hand-crafted fountain pens made from sustainable materials with precision-engineered nibs.',
-    imageSrc: 'https://images.unsplash.com/photo-1596265371388-43edbaadab94?q=80&w=800&auto=format&fit=crop',
-    category: 'design',
-    raised: 15000,
-    goal: 20000,
-    daysLeft: 28
-  },
-];
+import { Search, Loader2 } from 'lucide-react';
 
 const Projects = () => {
-  const [projects, setProjects] = useState(allProjects);
+  const [projects, setProjects] = useState([]);
+  const [filteredProjects, setFilteredProjects] = useState([]);
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('newest');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   
   useEffect(() => {
     window.scrollTo(0, 0);
+    fetchProjects();
   }, []);
   
+  const fetchProjects = async () => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const response = await fetch('http://localhost:5000/api/projects');
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch projects');
+      }
+      
+      const data = await response.json();
+      setProjects(data);
+      setFilteredProjects(data);
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+      setError(error instanceof Error ? error.message : 'An unexpected error occurred');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
   useEffect(() => {
-    let filteredProjects = [...allProjects];
+    let result = [...projects];
     
     // Filter by category
     if (activeCategory !== 'all') {
-      filteredProjects = filteredProjects.filter(
+      result = result.filter(
         (project) => project.category === activeCategory
       );
     }
@@ -146,39 +58,73 @@ const Projects = () => {
     // Filter by search query
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      filteredProjects = filteredProjects.filter(
+      result = result.filter(
         (project) =>
           project.title.toLowerCase().includes(query) ||
           project.description.toLowerCase().includes(query) ||
-          project.creator.toLowerCase().includes(query)
+          project.creator?.name?.toLowerCase().includes(query)
       );
     }
     
     // Sort projects
     switch (sortBy) {
       case 'newest':
-        // In a real app, this would sort by creation date
+        result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         break;
       case 'endingSoon':
-        filteredProjects.sort((a, b) => a.daysLeft - b.daysLeft);
+        result.sort((a, b) => {
+          const endDateA = new Date(a.createdAt);
+          endDateA.setDate(endDateA.getDate() + Number(a.duration));
+          
+          const endDateB = new Date(b.createdAt);
+          endDateB.setDate(endDateB.getDate() + Number(b.duration));
+          
+          return endDateA.getTime() - endDateB.getTime();
+        });
         break;
       case 'mostFunded':
-        filteredProjects.sort((a, b) => {
-          const percentA = (a.raised / a.goal) * 100;
-          const percentB = (b.raised / b.goal) * 100;
+        result.sort((a, b) => {
+          const percentA = a.raised ? (a.raised / a.goal) * 100 : 0;
+          const percentB = b.raised ? (b.raised / b.goal) * 100 : 0;
           return percentB - percentA;
         });
         break;
-      case 'mostBacked':
-        // In a real app, this would sort by backer count
+      default:
         break;
     }
     
-    setProjects(filteredProjects);
-  }, [activeCategory, searchQuery, sortBy]);
+    setFilteredProjects(result);
+  }, [activeCategory, searchQuery, sortBy, projects]);
   
   const handleCategoryChange = (categoryId: string) => {
     setActiveCategory(categoryId);
+  };
+  
+  // Calculate days left for a project
+  const calculateDaysLeft = (createdAt: string, duration: number) => {
+    const endDate = new Date(createdAt);
+    endDate.setDate(endDate.getDate() + duration);
+    
+    const now = new Date();
+    const diffTime = endDate.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    return diffDays > 0 ? diffDays : 0;
+  };
+  
+  // Format project data for the ProjectCard component
+  const formatProjectData = (project: any) => {
+    return {
+      id: project._id,
+      title: project.title,
+      creator: project.creator?.fullName || 'Anonymous',
+      description: project.description,
+      imageSrc: project.coverImage || 'https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=800&auto=format&fit=crop',
+      category: project.category,
+      raised: project.raised || 0,
+      goal: project.goal,
+      daysLeft: calculateDaysLeft(project.createdAt, project.duration)
+    };
   };
   
   return (
@@ -218,17 +164,26 @@ const Projects = () => {
                 <SelectItem value="newest">Newest</SelectItem>
                 <SelectItem value="endingSoon">Ending Soon</SelectItem>
                 <SelectItem value="mostFunded">Most Funded</SelectItem>
-                <SelectItem value="mostBacked">Most Backed</SelectItem>
               </SelectContent>
             </Select>
           </div>
           
           <Separator className="mb-8" />
           
-          {projects.length > 0 ? (
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-16">
+              <Loader2 className="h-10 w-10 animate-spin mb-4 text-primary" />
+              <p className="text-lg font-medium">Loading projects...</p>
+            </div>
+          ) : error ? (
+            <div className="text-center py-16">
+              <p className="text-2xl font-medium mb-2">Error loading projects</p>
+              <p className="text-muted-foreground">{error}</p>
+            </div>
+          ) : filteredProjects.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {projects.map((project) => (
-                <ProjectCard key={project.id} {...project} />
+              {filteredProjects.map((project) => (
+                <ProjectCard key={project._id} {...formatProjectData(project)} />
               ))}
             </div>
           ) : (
