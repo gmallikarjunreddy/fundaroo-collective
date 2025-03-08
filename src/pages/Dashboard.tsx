@@ -159,6 +159,8 @@ const Dashboard = () => {
                         
                         <div className="mt-4 mb-2">
                           <ProjectProgress 
+                            projectId={project.id}
+                            projectTitle={project.title}
                             raised={project.raised} 
                             goal={project.goal} 
                           />

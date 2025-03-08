@@ -44,6 +44,7 @@ export const createProject = async (projectData: ProjectData) => {
   const newProject = {
     _id: `new-${Date.now()}`,
     ...projectData,
+    coverImage: projectData.coverImage || 'https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=800&auto=format&fit=crop', // Default image if not provided
     creator: { name: 'Demo User', fullName: 'Demo User' },
     raised: 0,
     featured: false,
@@ -100,7 +101,7 @@ export const getUserProjects = async () => {
   return mockProjects.slice(0, 2);
 };
 
-// Donate to a project (new function)
+// Donate to a project
 export const donateToProject = async (projectId: string, amount: number) => {
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 1000));

@@ -274,6 +274,8 @@ const ProjectDetails = () => {
                 {/* Project Progress */}
                 <div className="bg-card border border-border rounded-xl p-6">
                   <ProjectProgress 
+                    projectId={project.id}
+                    projectTitle={project.title}
                     raised={project.raised} 
                     goal={project.goal} 
                     backers={project.backers} 
