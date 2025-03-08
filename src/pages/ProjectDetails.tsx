@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -22,6 +23,7 @@ import { Separator } from '@/components/ui/separator';
 import { getProjectById } from '@/services/projectService';
 import CustomAmountInput from '@/components/project/CustomAmountInput';
 import { donateToProject } from '@/services/projectService';
+import { toast } from 'sonner';
 
 const ProjectDetails = () => {
   const { id } = useParams<{ id: string }>();
