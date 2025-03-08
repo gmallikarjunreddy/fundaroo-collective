@@ -30,7 +30,7 @@ interface RazorpayResponse {
 }
 
 // Razorpay test credentials
-const RAZORPAY_KEY_ID = 'rzp_test_xxxxxxxxxx'; // Replace with your test key
+const RAZORPAY_KEY_ID = 'rzp_test_ZIsj6ZGng5SmuV'; // Updated with the correct test key
 
 // Check if Razorpay is loaded
 const isRazorpayLoaded = (): boolean => {
@@ -66,6 +66,8 @@ export const initiatePayment = async (
   backerInfo: { name?: string; email?: string; phone?: string } = {}
 ): Promise<boolean> => {
   try {
+    console.log(`Initiating payment for project ${projectId}: ₹${amount}`);
+    
     // Load Razorpay script if not already loaded
     const isLoaded = await loadRazorpayScript();
     if (!isLoaded) return false;
