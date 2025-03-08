@@ -13,25 +13,43 @@ A crowdfunding platform built with React and Bootstrap.
 - **Frontend:** React, Bootstrap
 - **Backend:** Node.js, Express.js
 - **Database:** MongoDB
-- **Authentication:** JWT 
-- **Payment Gateway:**  Razorpay
+- **Authentication:** JWT / Firebase Auth
+- **Payment Gateway:** Stripe / Razorpay
 
 ## Installation
 
-1. Clone the repository:
-   ```sh
-   git clone https://github.com/gmallikarjunreddy/fundaroo-collective.git
-   cd fundaroo-collective
-   ```
+Follow these steps:
 
-2. Install dependencies:
-   ```sh
-   npm install
-   ```
+```sh
+# Step 1: Clone the repository using the project's Git URL.
+git clone https://github.com/gmallikarjunreddy/fundaroo-collective.git
 
-3. Start the development server:
+# Step 2: Navigate to the project directory.
+cd fundaroo-collective
+
+# Step 3: Install the necessary dependencies.
+npm i
+
+# Step 4: Start the development server with auto-reloading and an instant preview.
+npm run dev
+```
+
+## Backend Setup
+
+To start the backend, follow these steps:
+
+1. Install **MongoDB Compass** to manage the database.
+2. Open a terminal and navigate to the backend directory:
    ```sh
-   npm start
+   cd server
+   ```
+3. Install backend dependencies:
+   ```sh
+   npm i
+   ```
+4. Start the backend server with auto-reloading:
+   ```sh
+   npm run dev
    ```
 
 ## Contributing
