@@ -11,7 +11,7 @@ export interface ProjectData {
   description: string;
   story: string;
   rewards?: any[];
-  coverImage?: string;
+  coverImage: string; // Changed from optional to required
 }
 
 export interface Project {

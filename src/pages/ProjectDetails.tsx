@@ -20,6 +20,8 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { getProjectById } from '@/services/projectService';
+import CustomAmountInput from '@/components/project/CustomAmountInput';
+import { donateToProject } from '@/services/projectService';
 
 const ProjectDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -27,6 +29,8 @@ const ProjectDetails = () => {
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState('');
   const [activeTab, setActiveTab] = useState('story');
+  const [isDonating, setIsDonating] = useState(false);
+  const [isProcessingDonation, setIsProcessingDonation] = useState(false);
   
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -82,6 +86,30 @@ const ProjectDetails = () => {
     );
   }
   
+  const handleDonate = async (amount: number) => {
+    if (!id) return;
+    
+    setIsProcessingDonation(true);
+    try {
+      await donateToProject(id, amount);
+      
+      toast.success("Thank you for your contribution!", {
+        description: `You have successfully backed this project with ₹${amount.toLocaleString()}.`
+      });
+      
+      const updatedProject = await getProjectById(id);
+      setProject(updatedProject);
+      setIsDonating(false);
+    } catch (error) {
+      console.error("Error processing donation:", error);
+      toast.error("Donation failed", {
+        description: "There was a problem processing your contribution. Please try again."
+      });
+    } finally {
+      setIsProcessingDonation(false);
+    }
+  };
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -96,7 +124,6 @@ const ProjectDetails = () => {
           </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-            {/* Main Content */}
             <div className="lg:col-span-8">
               <div className="mb-6">
                 <Badge variant="outline" className="mb-4">{project?.category}</Badge>
@@ -104,7 +131,6 @@ const ProjectDetails = () => {
                 <p className="text-xl text-muted-foreground mb-6">{project?.description}</p>
               </div>
               
-              {/* Image Gallery */}
               <div className="mb-10">
                 <div className="rounded-xl overflow-hidden bg-secondary/30 mb-4">
                   <img 
@@ -146,7 +172,6 @@ const ProjectDetails = () => {
                 )}
               </div>
               
-              {/* Project Content Tabs */}
               <Tabs defaultValue="story" value={activeTab} onValueChange={setActiveTab} className="mb-10">
                 <TabsList className="grid grid-cols-3 mb-6">
                   <TabsTrigger value="story">Story</TabsTrigger>
@@ -176,7 +201,6 @@ const ProjectDetails = () => {
                 </TabsContent>
               </Tabs>
               
-              {/* Project Updates and Comments */}
               <div className="grid grid-cols-2 gap-6 mb-10">
                 <div className="p-6 border border-border rounded-xl">
                   <div className="flex items-center justify-between mb-4">
@@ -207,10 +231,8 @@ const ProjectDetails = () => {
               </div>
             </div>
             
-            {/* Sidebar */}
             <div className="lg:col-span-4">
               <div className="lg:sticky lg:top-28 space-y-6">
-                {/* Project Progress */}
                 <div className="bg-card border border-border rounded-xl p-6">
                   {project && (
                     <ProjectProgress 
@@ -223,18 +245,42 @@ const ProjectDetails = () => {
                     />
                   )}
                   
-                  <div className="flex space-x-2 mt-6">
-                    <Button variant="outline" size="icon" aria-label="Save project">
-                      <Heart className="h-4 w-4" />
-                    </Button>
-                    <Button variant="outline" size="icon" aria-label="Share project">
-                      <Share2 className="h-4 w-4" />
-                    </Button>
-                    <Button className="flex-grow">Back this project</Button>
+                  <div className="mt-6">
+                    {isDonating ? (
+                      <div className="space-y-4">
+                        <h3 className="font-medium text-lg">Back this project</h3>
+                        <CustomAmountInput 
+                          onSubmit={handleDonate} 
+                          isSubmitting={isProcessingDonation} 
+                        />
+                        <Button 
+                          variant="outline" 
+                          className="w-full" 
+                          onClick={() => setIsDonating(false)}
+                          disabled={isProcessingDonation}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex space-x-2">
+                        <Button variant="outline" size="icon" aria-label="Save project">
+                          <Heart className="h-4 w-4" />
+                        </Button>
+                        <Button variant="outline" size="icon" aria-label="Share project">
+                          <Share2 className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          className="flex-grow"
+                          onClick={() => setIsDonating(true)}
+                        >
+                          Back this project
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </div>
                 
-                {/* Project Dates */}
                 <div className="bg-card border border-border rounded-xl p-6">
                   <h3 className="font-medium mb-4">Project Timeline</h3>
                   <div className="space-y-4">
@@ -255,7 +301,6 @@ const ProjectDetails = () => {
                   </div>
                 </div>
                 
-                {/* Creator Info */}
                 <div className="bg-card border border-border rounded-xl p-6">
                   <h3 className="font-medium mb-4">About the Creator</h3>
                   <div className="flex items-center mb-4">
@@ -280,7 +325,6 @@ const ProjectDetails = () => {
                   </Button>
                 </div>
                 
-                {/* Additional Info */}
                 <div className="bg-secondary/50 rounded-xl p-6">
                   <div className="flex items-start mb-4">
                     <AlertCircle className="h-5 w-5 mr-3 text-muted-foreground" />

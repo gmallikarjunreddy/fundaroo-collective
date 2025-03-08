@@ -64,7 +64,7 @@ const ProjectCard = ({
         
         <div>
           <div className="flex justify-between items-center text-sm mb-2">
-            <span>${raised.toLocaleString()} raised</span>
+            <span>₹{raised.toLocaleString()} raised</span>
             <span>{percentage}%</span>
           </div>
           
@@ -79,7 +79,7 @@ const ProjectCard = ({
           
           <div className="flex justify-between items-center text-xs text-muted-foreground">
             <span>{daysLeft} days left</span>
-            {featured && <span>{Math.round(goal / 1000)}K goal</span>}
+            {featured && <span>₹{Math.round(goal / 1000)}K goal</span>}
           </div>
         </div>
       </div>

@@ -3,6 +3,7 @@ import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import ImageUploadField from './ImageUploadField';
 
 interface ProjectBasicsFormProps {
   formData: {
@@ -10,17 +11,24 @@ interface ProjectBasicsFormProps {
     category: string;
     goal: string;
     duration: string;
+    coverImage: string;
   };
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSelectChange: (name: string, value: string) => void;
+  handleImageChange: (value: string) => void;
 }
 
-const ProjectBasicsForm = ({ formData, handleChange, handleSelectChange }: ProjectBasicsFormProps) => {
+const ProjectBasicsForm = ({ 
+  formData, 
+  handleChange, 
+  handleSelectChange,
+  handleImageChange
+}: ProjectBasicsFormProps) => {
   return (
     <div className="space-y-6">
       <h2 className="text-xl font-semibold mb-4">Project Basics</h2>
       
-      <div className="space-y-4">
+      <div className="space-y-6">
         <div>
           <Label htmlFor="title">Project Title</Label>
           <Input 
@@ -32,6 +40,11 @@ const ProjectBasicsForm = ({ formData, handleChange, handleSelectChange }: Proje
             className="mt-1"
           />
         </div>
+        
+        <ImageUploadField 
+          value={formData.coverImage} 
+          onChange={handleImageChange} 
+        />
         
         <div>
           <Label htmlFor="category">Category</Label>
@@ -55,14 +68,14 @@ const ProjectBasicsForm = ({ formData, handleChange, handleSelectChange }: Proje
         </div>
         
         <div>
-          <Label htmlFor="goal">Funding Goal ($)</Label>
+          <Label htmlFor="goal">Funding Goal (₹)</Label>
           <Input 
             id="goal" 
             name="goal" 
             value={formData.goal} 
             onChange={handleChange} 
             type="number" 
-            placeholder="Enter amount in USD" 
+            placeholder="Enter amount in ₹" 
             className="mt-1"
           />
         </div>

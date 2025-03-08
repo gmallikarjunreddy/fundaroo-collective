@@ -57,6 +57,15 @@ const CreateProject = () => {
     }));
   };
 
+  const handleImageChange = (value: string) => {
+    setFormData(prev => ({ ...prev, coverImage: value }));
+    // Save form data to localStorage when image changes
+    localStorage.setItem('pendingProject', JSON.stringify({
+      ...formData,
+      coverImage: value
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -79,6 +88,14 @@ const CreateProject = () => {
       return;
     }
 
+    // Validate cover image
+    if (!formData.coverImage) {
+      toast.error('Cover Image Required', {
+        description: 'Please upload a cover image for your project.'
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -92,6 +109,7 @@ const CreateProject = () => {
         description: formData.description,
         story: formData.story,
         rewards: formData.rewards,
+        coverImage: formData.coverImage
       };
       
       const result = await createProject(projectDataToSubmit);
@@ -160,7 +178,8 @@ const CreateProject = () => {
           <ProjectBasicsForm 
             formData={formData} 
             handleChange={handleChange} 
-            handleSelectChange={handleSelectChange} 
+            handleSelectChange={handleSelectChange}
+            handleImageChange={handleImageChange}
           />
         )}
         

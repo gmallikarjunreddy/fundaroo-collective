@@ -10,7 +10,7 @@ import { ArrowRight, ArrowUp, Users, DollarSign, BarChart, Bell } from 'lucide-r
 const Dashboard = () => {
   // Mock data for dashboard
   const userStats = {
-    totalRaised: '$24,500',
+    totalRaised: '₹24,500',
     totalBacked: 14,
     followers: 86,
     projectViews: 1243
@@ -169,11 +169,11 @@ const Dashboard = () => {
                         <div className="flex flex-wrap gap-x-6 gap-y-2 mt-4 text-sm">
                           <div>
                             <span className="text-muted-foreground">Raised: </span>
-                            <span className="font-medium">${project.raised.toLocaleString()}</span>
+                            <span className="font-medium">₹{project.raised.toLocaleString()}</span>
                           </div>
                           <div>
                             <span className="text-muted-foreground">Goal: </span>
-                            <span className="font-medium">${project.goal.toLocaleString()}</span>
+                            <span className="font-medium">₹{project.goal.toLocaleString()}</span>
                           </div>
                           <div>
                             <span className="text-muted-foreground">Backers: </span>
