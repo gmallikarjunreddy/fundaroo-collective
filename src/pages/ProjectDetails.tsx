@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -23,7 +22,6 @@ import { Separator } from '@/components/ui/separator';
 import { getProjectById } from '@/services/projectService';
 import CustomAmountInput from '@/components/project/CustomAmountInput';
 import { donateToProject } from '@/services/projectService';
-import { toast } from '@/hooks/use-toast';
 
 const ProjectDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -95,8 +93,7 @@ const ProjectDetails = () => {
     try {
       await donateToProject(id, amount);
       
-      toast({
-        title: "Thank you for your contribution!",
+      toast.success("Thank you for your contribution!", {
         description: `You have successfully backed this project with ₹${amount.toLocaleString()}.`
       });
       
@@ -105,10 +102,8 @@ const ProjectDetails = () => {
       setIsDonating(false);
     } catch (error) {
       console.error("Error processing donation:", error);
-      toast({
-        title: "Donation failed",
-        description: "There was a problem processing your contribution. Please try again.",
-        variant: "destructive"
+      toast.error("Donation failed", {
+        description: "There was a problem processing your contribution. Please try again."
       });
     } finally {
       setIsProcessingDonation(false);
