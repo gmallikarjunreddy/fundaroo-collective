@@ -46,6 +46,7 @@ export const createProject = async (projectData: ProjectData) => {
     ...projectData,
     creator: { name: 'Demo User', fullName: 'Demo User' },
     raised: 0,
+    featured: false,
     createdAt: new Date().toISOString()
   };
   
@@ -97,4 +98,23 @@ export const getUserProjects = async () => {
   
   // For demo purposes, return the first 2 projects as user projects
   return mockProjects.slice(0, 2);
+};
+
+// Donate to a project (new function)
+export const donateToProject = async (projectId: string, amount: number) => {
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  
+  const projectIndex = mockProjects.findIndex(p => p._id === projectId);
+  if (projectIndex === -1) {
+    throw new Error('Project not found');
+  }
+  
+  // Update the project's raised amount
+  mockProjects[projectIndex].raised += amount;
+  
+  return {
+    success: true,
+    project: mockProjects[projectIndex]
+  };
 };

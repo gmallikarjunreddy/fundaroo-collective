@@ -1,7 +1,13 @@
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { initiatePayment } from '@/services/paymentService';
+import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface ProjectProgressProps {
+  projectId: string;
+  projectTitle: string;
   raised: number;
   goal: number;
   backers?: number;
@@ -10,6 +16,8 @@ interface ProjectProgressProps {
 }
 
 const ProjectProgress = ({ 
+  projectId,
+  projectTitle,
   raised, 
   goal, 
   backers = 0, 
@@ -17,13 +25,31 @@ const ProjectProgress = ({
   className = ""
 }: ProjectProgressProps) => {
   const progressRef = useRef<HTMLDivElement>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   const percentage = Math.min(Math.round((raised / goal) * 100), 100);
+  const queryClient = useQueryClient();
   
   useEffect(() => {
     if (progressRef.current) {
       progressRef.current.style.setProperty('--progress-value', `${percentage}%`);
     }
   }, [percentage]);
+
+  const handleQuickDonate = async (amount: number) => {
+    setIsProcessing(true);
+    try {
+      const success = await initiatePayment(projectId, amount, projectTitle);
+      if (success) {
+        queryClient.invalidateQueries({ queryKey: ['project', projectId] });
+        queryClient.invalidateQueries({ queryKey: ['projects'] });
+      }
+    } catch (error) {
+      console.error('Error with quick donation:', error);
+      toast.error('Failed to process donation');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   return (
     <div className={`space-y-6 ${className}`}>
@@ -43,12 +69,40 @@ const ProjectProgress = ({
       {/* Progress Bar */}
       <div 
         ref={progressRef}
-        className="h-2 bg-secondary rounded-full progress-bar overflow-hidden"
+        className="h-2 bg-secondary rounded-full progress-bar overflow-hidden relative before:absolute before:bg-primary before:h-full before:left-0 before:top-0 before:w-[var(--progress-value,0%)]"
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={percentage}
         role="progressbar"
       ></div>
+      
+      {/* Quick Donate Buttons */}
+      <div className="grid grid-cols-3 gap-2 mt-2">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={() => handleQuickDonate(10)}
+          disabled={isProcessing}
+        >
+          ₹10
+        </Button>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={() => handleQuickDonate(50)}
+          disabled={isProcessing}
+        >
+          ₹50
+        </Button>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={() => handleQuickDonate(100)}
+          disabled={isProcessing}
+        >
+          ₹100
+        </Button>
+      </div>
       
       {(backers !== undefined || daysLeft !== undefined) && (
         <div className="grid grid-cols-2 gap-4 mt-6">
