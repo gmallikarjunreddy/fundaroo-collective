@@ -1,8 +1,6 @@
 
 import { toast } from 'sonner';
-
-// API base URL that works for both development and production
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+import { mockUser } from './mockData';
 
 // Helper function to get user info from localStorage
 export const getUserInfo = () => {
@@ -30,54 +28,35 @@ export const getToken = () => {
 
 // Login user
 export const loginUser = async (email: string, password: string) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/users/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
-    });
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 800));
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to login');
-    }
-
+  // For demo, just check if email contains "demo" and password isn't empty
+  if (email.includes('demo') && password.length > 0) {
     // Save user data to localStorage
-    localStorage.setItem('userInfo', JSON.stringify(data));
-    
-    return data;
-  } catch (error) {
-    throw error;
+    localStorage.setItem('userInfo', JSON.stringify(mockUser));
+    return mockUser;
+  } else {
+    throw new Error('Invalid email or password. Try using an email with "demo".');
   }
 };
 
 // Register user
 export const registerUser = async (userData: { name: string; email: string; password: string }) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/users/register`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(userData),
-    });
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to register');
-    }
-
-    // Save user data to localStorage
-    localStorage.setItem('userInfo', JSON.stringify(data));
-    
-    return data;
-  } catch (error) {
-    throw error;
-  }
+  // For demo, just create a new user with the provided data
+  const newUser = {
+    ...mockUser,
+    name: userData.name,
+    email: userData.email
+  };
+  
+  // Save user data to localStorage
+  localStorage.setItem('userInfo', JSON.stringify(newUser));
+  
+  return newUser;
 };
 
 // Logout user

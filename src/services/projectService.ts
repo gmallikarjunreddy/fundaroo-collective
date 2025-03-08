@@ -1,5 +1,5 @@
 
-import { getToken } from '@/utils/auth';
+import { mockProjects } from '@/utils/mockData';
 
 // Interface for project data
 export interface ProjectData {
@@ -13,157 +13,88 @@ export interface ProjectData {
   coverImage?: string;
 }
 
-// API base URL that works for both development and production
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-
 // Get all projects
 export const getAllProjects = async () => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/projects`);
-    
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || 'Failed to fetch projects');
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching projects:', error);
-    throw error;
-  }
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+  return [...mockProjects];
 };
 
 // Get project by ID
 export const getProjectById = async (projectId: string) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/projects/${projectId}`);
-    
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || 'Failed to fetch project');
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error(`Error fetching project ${projectId}:`, error);
-    throw error;
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  const project = mockProjects.find(p => p._id === projectId);
+  if (!project) {
+    throw new Error('Project not found');
   }
+  
+  return project;
 };
 
 // Create new project
 export const createProject = async (projectData: ProjectData) => {
-  const token = getToken();
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
   
-  if (!token) {
-    throw new Error('Authentication required');
-  }
+  console.log('Creating project with data:', projectData);
   
-  try {
-    console.log('Creating project with data:', projectData);
-    const response = await fetch(`${API_BASE_URL}/projects`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(projectData),
-    });
-    
-    const data = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to create project');
-    }
-    
-    return data;
-  } catch (error) {
-    console.error('Error creating project:', error);
-    throw error;
-  }
+  // Create a new project with mock data
+  const newProject = {
+    _id: `new-${Date.now()}`,
+    ...projectData,
+    creator: { name: 'Demo User', fullName: 'Demo User' },
+    raised: 0,
+    createdAt: new Date().toISOString()
+  };
+  
+  // In a real app, this would be saved to a database
+  mockProjects.push(newProject);
+  
+  return newProject;
 };
 
 // Update project
 export const updateProject = async (projectId: string, projectData: Partial<ProjectData>) => {
-  const token = getToken();
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
   
-  if (!token) {
-    throw new Error('Authentication required');
+  const projectIndex = mockProjects.findIndex(p => p._id === projectId);
+  if (projectIndex === -1) {
+    throw new Error('Project not found');
   }
   
-  try {
-    const response = await fetch(`${API_BASE_URL}/projects/${projectId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(projectData),
-    });
-    
-    const data = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to update project');
-    }
-    
-    return data;
-  } catch (error) {
-    console.error(`Error updating project ${projectId}:`, error);
-    throw error;
-  }
+  // Update the project
+  mockProjects[projectIndex] = {
+    ...mockProjects[projectIndex],
+    ...projectData
+  };
+  
+  return mockProjects[projectIndex];
 };
 
 // Delete project
 export const deleteProject = async (projectId: string) => {
-  const token = getToken();
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 500));
   
-  if (!token) {
-    throw new Error('Authentication required');
+  const projectIndex = mockProjects.findIndex(p => p._id === projectId);
+  if (projectIndex === -1) {
+    throw new Error('Project not found');
   }
   
-  try {
-    const response = await fetch(`${API_BASE_URL}/projects/${projectId}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    
-    if (!response.ok) {
-      const data = await response.json().catch(() => ({}));
-      throw new Error(data.message || 'Failed to delete project');
-    }
-    
-    return true;
-  } catch (error) {
-    console.error(`Error deleting project ${projectId}:`, error);
-    throw error;
-  }
+  // Remove the project
+  mockProjects.splice(projectIndex, 1);
+  
+  return true;
 };
 
 // Get user projects
 export const getUserProjects = async () => {
-  const token = getToken();
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 500));
   
-  if (!token) {
-    throw new Error('Authentication required');
-  }
-  
-  try {
-    const response = await fetch(`${API_BASE_URL}/projects/user`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || 'Failed to fetch user projects');
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching user projects:', error);
-    throw error;
-  }
+  // For demo purposes, return the first 2 projects as user projects
+  return mockProjects.slice(0, 2);
 };
