@@ -13,7 +13,9 @@ export const mockProjects = [
     duration: 30,
     createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
     story: 'Our minimal desk clock combines elegant design with precision timekeeping. Perfect for any workspace.',
-    featured: true
+    featured: true,
+    backers: 156,
+    daysLeft: 15
   },
   {
     _id: '2',
@@ -27,7 +29,9 @@ export const mockProjects = [
     duration: 45,
     createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
     story: 'Our backpacks are made from 100% recycled materials, helping you adventure responsibly.',
-    featured: false
+    featured: false,
+    backers: 87,
+    daysLeft: 40
   },
   {
     _id: '3',
@@ -41,7 +45,9 @@ export const mockProjects = [
     duration: 30,
     createdAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
     story: 'Experience music like never before with our revolutionary spatial audio technology.',
-    featured: false
+    featured: false,
+    backers: 342,
+    daysLeft: 10
   },
   {
     _id: '4',
@@ -55,7 +61,9 @@ export const mockProjects = [
     duration: 60,
     createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
     story: 'Dive into a world where magic meets the modern city in our illustrated novel series.',
-    featured: false
+    featured: false,
+    backers: 76,
+    daysLeft: 45
   },
   {
     _id: '5',
@@ -69,7 +77,9 @@ export const mockProjects = [
     duration: 40,
     createdAt: new Date(Date.now() - 22 * 24 * 60 * 60 * 1000).toISOString(),
     story: 'Each piece in our tableware collection is handcrafted with care by skilled artisans.',
-    featured: false
+    featured: false,
+    backers: 124,
+    daysLeft: 18
   }
 ];
 

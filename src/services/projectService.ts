@@ -31,8 +31,8 @@ export interface Project {
   raised: number;
   featured: boolean;
   createdAt: string;
-  backers?: number;
-  daysLeft?: number;
+  backers: number;
+  daysLeft: number;
 }
 
 // Calculate days left for a project
