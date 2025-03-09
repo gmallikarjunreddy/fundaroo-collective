@@ -1,11 +1,11 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { Button } from '@/components/ui/button';
 import ProjectCard from './ProjectCard';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-// Mock data for featured projects
+// Move mockData outside to prevent recreation
 const mockProjects = [
   {
     id: '1',
@@ -42,44 +42,25 @@ const mockProjects = [
     goal: 100000,
     daysLeft: 10,
     featured: false
-  },
-  {
-    id: '4',
-    title: 'Illustrated Urban Fantasy Novel Series',
-    creator: 'Fantasia Publishing',
-    description: 'A richly illustrated series of novels exploring magical realism in contemporary urban settings.',
-    imageSrc: 'https://images.unsplash.com/photo-1476275466078-4007374efbbe?q=80&w=800&auto=format&fit=crop',
-    category: 'Publishing',
-    raised: 12000,
-    goal: 20000,
-    daysLeft: 45,
-    featured: false
-  },
-  {
-    id: '5',
-    title: 'Ceramic Handcrafted Tableware Collection',
-    creator: 'Clay Studios',
-    description: 'Artisan-made ceramic plates, bowls, and mugs with unique glazes and minimalist design.',
-    imageSrc: 'https://images.unsplash.com/photo-1610701596061-2ecf227e85b2?q=80&w=800&auto=format&fit=crop',
-    category: 'Art',
-    raised: 28000,
-    goal: 35000,
-    daysLeft: 18,
-    featured: false
   }
 ];
 
+// Memoize the ProjectCard component to prevent unnecessary re-renders
+const MemoizedProjectCard = memo(ProjectCard);
+
 const FeaturedProjects = () => {
   const [projects, setProjects] = useState(mockProjects);
+  const [isLoading, setIsLoading] = useState(false);
   
-  // Simulate loading data
   useEffect(() => {
-    // In a real app, this would be an API call
-    const timer = setTimeout(() => {
-      setProjects(mockProjects);
-    }, 500);
+    // Directly use the mock data instead of waiting
+    setProjects(mockProjects);
     
-    return () => clearTimeout(timer);
+    // Log performance data
+    if (window.performance) {
+      const perfData = window.performance.getEntriesByType('navigation')[0];
+      console.log('Navigation performance:', perfData);
+    }
   }, []);
 
   return (
@@ -99,8 +80,8 @@ const FeaturedProjects = () => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects.map((project, index) => (
-            <ProjectCard
+          {projects.slice(0, 3).map((project, index) => (
+            <MemoizedProjectCard
               key={project.id}
               {...project}
               featured={index === 0}

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -23,7 +22,9 @@ import { Separator } from '@/components/ui/separator';
 import { getProjectById } from '@/services/projectService';
 import CustomAmountInput from '@/components/project/CustomAmountInput';
 import { donateToProject } from '@/services/projectService';
+import { initiatePayment } from '@/services/paymentService';
 import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
 
 const ProjectDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -33,6 +34,7 @@ const ProjectDetails = () => {
   const [activeTab, setActiveTab] = useState('story');
   const [isDonating, setIsDonating] = useState(false);
   const [isProcessingDonation, setIsProcessingDonation] = useState(false);
+  const queryClient = useQueryClient();
   
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -93,15 +95,17 @@ const ProjectDetails = () => {
     
     setIsProcessingDonation(true);
     try {
-      await donateToProject(id, amount);
+      const success = await initiatePayment(id, amount, project.title);
       
-      toast.success("Thank you for your contribution!", {
-        description: `You have successfully backed this project with ₹${amount.toLocaleString()}.`
-      });
-      
-      const updatedProject = await getProjectById(id);
-      setProject(updatedProject);
-      setIsDonating(false);
+      if (success) {
+        toast.success("Thank you for your contribution!", {
+          description: `You have successfully backed this project with ₹${amount.toLocaleString()}.`
+        });
+        
+        queryClient.invalidateQueries({ queryKey: ['project', id] });
+        queryClient.invalidateQueries({ queryKey: ['projects'] });
+        setIsDonating(false);
+      }
     } catch (error) {
       console.error("Error processing donation:", error);
       toast.error("Donation failed", {

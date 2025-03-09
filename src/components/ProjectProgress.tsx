@@ -29,13 +29,17 @@ const ProjectProgress = ({
   const percentage = Math.min(Math.round((raised / goal) * 100), 100);
   const queryClient = useQueryClient();
   
+  // Set the progress bar width using CSS variable
   useEffect(() => {
     if (progressRef.current) {
       progressRef.current.style.setProperty('--progress-value', `${percentage}%`);
     }
   }, [percentage]);
 
+  // Safe donation handler with error handling
   const handleQuickDonate = async (amount: number) => {
+    if (isProcessing) return; // Prevent double-clicks
+    
     setIsProcessing(true);
     try {
       const success = await initiatePayment(projectId, amount, projectTitle);
@@ -45,9 +49,19 @@ const ProjectProgress = ({
       }
     } catch (error) {
       console.error('Error with quick donation:', error);
-      toast.error('Failed to process donation');
+      toast.error('Failed to process donation. Please try again.');
     } finally {
       setIsProcessing(false);
+    }
+  };
+
+  // Format currency safely
+  const formatCurrency = (value: number): string => {
+    try {
+      return "₹" + value.toLocaleString();
+    } catch (error) {
+      console.error('Error formatting currency:', error);
+      return "₹" + value;
     }
   };
 
@@ -55,9 +69,9 @@ const ProjectProgress = ({
     <div className={`space-y-6 ${className}`}>
       <div className="flex items-end justify-between mb-2">
         <div>
-          <p className="text-3xl font-medium">₹{raised.toLocaleString()}</p>
+          <p className="text-3xl font-medium">{formatCurrency(raised)}</p>
           <p className="text-muted-foreground mt-1">
-            of ₹{goal.toLocaleString()} goal
+            of {formatCurrency(goal)} goal
           </p>
         </div>
         <div className="text-right">
@@ -69,7 +83,7 @@ const ProjectProgress = ({
       {/* Progress Bar */}
       <div 
         ref={progressRef}
-        className="h-2 bg-secondary rounded-full progress-bar overflow-hidden relative before:absolute before:bg-primary before:h-full before:left-0 before:top-0 before:w-[var(--progress-value,0%)]"
+        className="h-2 bg-secondary rounded-full progress-bar overflow-hidden relative"
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={percentage}
@@ -81,26 +95,26 @@ const ProjectProgress = ({
         <Button 
           variant="outline" 
           size="sm" 
-          onClick={() => handleQuickDonate(10)}
-          disabled={isProcessing}
-        >
-          ₹10
-        </Button>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={() => handleQuickDonate(50)}
-          disabled={isProcessing}
-        >
-          ₹50
-        </Button>
-        <Button 
-          variant="outline" 
-          size="sm" 
           onClick={() => handleQuickDonate(100)}
           disabled={isProcessing}
         >
           ₹100
+        </Button>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={() => handleQuickDonate(500)}
+          disabled={isProcessing}
+        >
+          ₹500
+        </Button>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={() => handleQuickDonate(1000)}
+          disabled={isProcessing}
+        >
+          ₹1000
         </Button>
       </div>
       
