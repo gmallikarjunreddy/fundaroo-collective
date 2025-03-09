@@ -30,6 +30,17 @@ const Hero = () => {
             </Link>
           </div>
         </div>
+        
+        {/* Featured Project Image */}
+        <div className="mt-16 max-w-4xl mx-auto relative animate-fade-in [animation-delay:0.4s]">
+          <img 
+            src="/lovable-uploads/ff4258c3-ed05-4194-9ccc-aaa2204443aa.png" 
+            alt="Featured Project" 
+            className="w-full h-auto rounded-xl shadow-lg"
+            loading="lazy"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent rounded-xl"></div>
+        </div>
       </div>
       
       {/* Background Elements */}

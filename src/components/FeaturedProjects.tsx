@@ -1,11 +1,11 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { Button } from '@/components/ui/button';
 import ProjectCard from './ProjectCard';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-// Mock data for featured projects - moved outside component to prevent recreation on render
+// Move mockData outside to prevent recreation
 const mockProjects = [
   {
     id: '1',
@@ -45,13 +45,22 @@ const mockProjects = [
   }
 ];
 
+// Memoize the ProjectCard component to prevent unnecessary re-renders
+const MemoizedProjectCard = memo(ProjectCard);
+
 const FeaturedProjects = () => {
   const [projects, setProjects] = useState(mockProjects);
-  const [isLoading, setIsLoading] = useState(false); // Changed to false to prevent flickering
+  const [isLoading, setIsLoading] = useState(false);
   
-  // Use immediate data instead of timeout for better performance
   useEffect(() => {
+    // Directly use the mock data instead of waiting
     setProjects(mockProjects);
+    
+    // Log performance data
+    if (window.performance) {
+      const perfData = window.performance.getEntriesByType('navigation')[0];
+      console.log('Navigation performance:', perfData);
+    }
   }, []);
 
   return (
@@ -72,7 +81,7 @@ const FeaturedProjects = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.slice(0, 3).map((project, index) => (
-            <ProjectCard
+            <MemoizedProjectCard
               key={project.id}
               {...project}
               featured={index === 0}
