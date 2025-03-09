@@ -47,17 +47,11 @@ const mockProjects = [
 
 const FeaturedProjects = () => {
   const [projects, setProjects] = useState(mockProjects);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false); // Changed to false to prevent flickering
   
-  // Optimize mock data loading simulation
+  // Use immediate data instead of timeout for better performance
   useEffect(() => {
-    // Reduced timeout and simplified state management
-    const timer = setTimeout(() => {
-      setProjects(mockProjects);
-      setIsLoading(false);
-    }, 100); // Reduced from 500ms to 100ms
-    
-    return () => clearTimeout(timer);
+    setProjects(mockProjects);
   }, []);
 
   return (
