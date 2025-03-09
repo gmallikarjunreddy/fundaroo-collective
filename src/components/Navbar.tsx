@@ -7,13 +7,26 @@ import {
   Menu, 
   X, 
   Heart, 
-  User
+  User,
+  LogOut,
+  Settings
 } from 'lucide-react';
+import { useUser } from '@/context/UserContext';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const { user, isAuthenticated, logout } = useUser();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,6 +45,10 @@ const Navbar = () => {
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
+
+  const handleLogout = () => {
+    logout();
+  };
 
   return (
     <header 
@@ -78,15 +95,56 @@ const Navbar = () => {
           <Button variant="ghost" size="icon" aria-label="Saved projects">
             <Heart className="h-5 w-5" />
           </Button>
-          <Link to="/login">
-            <Button className="rounded-full" variant="outline">
-              <User className="h-4 w-4 mr-2" />
-              Sign In
-            </Button>
-          </Link>
-          <Link to="/register">
-            <Button className="rounded-full">Join</Button>
-          </Link>
+          
+          {isAuthenticated ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="rounded-full">
+                  <Avatar className="h-6 w-6 mr-2">
+                    <AvatarImage src="" alt={user?.name} />
+                    <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  <span className="hidden sm:inline">{user?.name}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/dashboard">Dashboard</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/profile">Profile</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/my-projects">My Projects</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/settings">
+                    <Settings className="mr-2 h-4 w-4" />
+                    Settings
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <>
+              <Link to="/login">
+                <Button className="rounded-full" variant="outline">
+                  <User className="h-4 w-4 mr-2" />
+                  Sign In
+                </Button>
+              </Link>
+              <Link to="/register">
+                <Button className="rounded-full">Join</Button>
+              </Link>
+            </>
+          )}
         </div>
         
         <Button 
@@ -127,20 +185,58 @@ const Navbar = () => {
                 Start a Project
               </Link>
               <div className="h-px bg-border my-2"></div>
-              <Link 
-                to="/login" 
-                className="px-4 py-3 hover:bg-gray-50 rounded-md"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Sign In
-              </Link>
-              <Link 
-                to="/register" 
-                className="px-4 py-3 bg-primary text-white rounded-md text-center"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Join Fundaroo
-              </Link>
+              
+              {isAuthenticated ? (
+                <>
+                  <Link 
+                    to="/dashboard" 
+                    className="px-4 py-3 hover:bg-gray-50 rounded-md"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Dashboard
+                  </Link>
+                  <Link 
+                    to="/profile" 
+                    className="px-4 py-3 hover:bg-gray-50 rounded-md"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Profile
+                  </Link>
+                  <Link 
+                    to="/my-projects" 
+                    className="px-4 py-3 hover:bg-gray-50 rounded-md"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    My Projects
+                  </Link>
+                  <button 
+                    className="px-4 py-3 text-left text-red-500 hover:bg-gray-50 rounded-md"
+                    onClick={() => {
+                      handleLogout();
+                      setIsMobileMenuOpen(false);
+                    }}
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link 
+                    to="/login" 
+                    className="px-4 py-3 hover:bg-gray-50 rounded-md"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Sign In
+                  </Link>
+                  <Link 
+                    to="/register" 
+                    className="px-4 py-3 bg-primary text-white rounded-md text-center"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Join Fundaroo
+                  </Link>
+                </>
+              )}
             </nav>
           </div>
         </div>

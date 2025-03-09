@@ -55,9 +55,9 @@ const ProjectProgress = ({
     <div className={`space-y-6 ${className}`}>
       <div className="flex items-end justify-between mb-2">
         <div>
-          <p className="text-3xl font-medium">${raised.toLocaleString()}</p>
+          <p className="text-3xl font-medium">₹{raised.toLocaleString()}</p>
           <p className="text-muted-foreground mt-1">
-            of ${goal.toLocaleString()} goal
+            of ₹{goal.toLocaleString()} goal
           </p>
         </div>
         <div className="text-right">
