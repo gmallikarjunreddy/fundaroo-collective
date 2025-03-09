@@ -81,26 +81,26 @@ const ProjectProgress = ({
         <Button 
           variant="outline" 
           size="sm" 
-          onClick={() => handleQuickDonate(10)}
-          disabled={isProcessing}
-        >
-          ₹10
-        </Button>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={() => handleQuickDonate(50)}
-          disabled={isProcessing}
-        >
-          ₹50
-        </Button>
-        <Button 
-          variant="outline" 
-          size="sm" 
           onClick={() => handleQuickDonate(100)}
           disabled={isProcessing}
         >
           ₹100
+        </Button>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={() => handleQuickDonate(500)}
+          disabled={isProcessing}
+        >
+          ₹500
+        </Button>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={() => handleQuickDonate(1000)}
+          disabled={isProcessing}
+        >
+          ₹1000
         </Button>
       </div>
       
