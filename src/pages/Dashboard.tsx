@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -6,8 +5,14 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import ProjectProgress from '@/components/ProjectProgress';
 import { ArrowRight, ArrowUp, Users, DollarSign, BarChart, Bell } from 'lucide-react';
+import EditProjectDialog from '@/components/project/EditProjectDialog';
+import DeleteProjectDialog from '@/components/project/DeleteProjectDialog';
+import { useProjects } from '@/hooks/useProjects';
 
 const Dashboard = () => {
+  // Get user projects using the useProjects hook with userOnly flag
+  const { projects, isLoading, refreshProjects } = useProjects(true);
+
   // Mock data for dashboard
   const userStats = {
     totalRaised: '₹24,500',
@@ -148,56 +153,73 @@ const Dashboard = () => {
             </TabsList>
             
             <TabsContent value="active">
-              {activeProjects.map(project => (
-                <Card key={project.id} className="mb-4">
-                  <CardContent className="p-6">
-                    <div className="flex flex-col md:flex-row justify-between gap-4">
-                      <div className="flex-1">
-                        <Link to={`/project/${project.id}`} className="text-lg font-medium hover:underline">
-                          {project.title}
-                        </Link>
+              {projects.length > 0 ? (
+                projects.map(project => (
+                  <Card key={project._id} className="mb-4">
+                    <CardContent className="p-6">
+                      <div className="flex flex-col md:flex-row justify-between gap-4">
+                        <div className="flex-1">
+                          <Link to={`/project/${project._id}`} className="text-lg font-medium hover:underline">
+                            {project.title}
+                          </Link>
+                          
+                          <div className="mt-4 mb-2">
+                            <ProjectProgress 
+                              projectId={project.id}
+                              projectTitle={project.title}
+                              raised={project.raised} 
+                              goal={project.goal} 
+                            />
+                          </div>
+                          
+                          <div className="flex flex-wrap gap-x-6 gap-y-2 mt-4 text-sm">
+                            <div>
+                              <span className="text-muted-foreground">Raised: </span>
+                              <span className="font-medium">₹{project.raised.toLocaleString()}</span>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Goal: </span>
+                              <span className="font-medium">₹{project.goal.toLocaleString()}</span>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Backers: </span>
+                              <span className="font-medium">{project.backers}</span>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Days left: </span>
+                              <span className="font-medium">{project.daysLeft}</span>
+                            </div>
+                          </div>
+                        </div>
                         
-                        <div className="mt-4 mb-2">
-                          <ProjectProgress 
-                            projectId={project.id}
-                            projectTitle={project.title}
-                            raised={project.raised} 
-                            goal={project.goal} 
+                        <div className="flex gap-2 mt-4 md:mt-0 self-end">
+                          <EditProjectDialog 
+                            project={project} 
+                            onUpdate={refreshProjects} 
                           />
-                        </div>
-                        
-                        <div className="flex flex-wrap gap-x-6 gap-y-2 mt-4 text-sm">
-                          <div>
-                            <span className="text-muted-foreground">Raised: </span>
-                            <span className="font-medium">₹{project.raised.toLocaleString()}</span>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">Goal: </span>
-                            <span className="font-medium">₹{project.goal.toLocaleString()}</span>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">Backers: </span>
-                            <span className="font-medium">{project.backers}</span>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">Days left: </span>
-                            <span className="font-medium">{project.daysLeft}</span>
-                          </div>
+                          <DeleteProjectDialog 
+                            projectId={project._id}
+                            projectTitle={project.title}
+                            onDelete={refreshProjects}
+                          />
+                          <Button variant="outline" size="sm" asChild>
+                            <Link to={`/project/${project._id}`}>View</Link>
+                          </Button>
                         </div>
                       </div>
-                      
-                      <div className="flex gap-2 mt-4 md:mt-0 self-end">
-                        <Button variant="outline" size="sm" asChild>
-                          <Link to={`/project/${project.id}/edit`}>Manage</Link>
-                        </Button>
-                        <Button size="sm" asChild>
-                          <Link to={`/project/${project.id}`}>View</Link>
-                        </Button>
-                      </div>
-                    </div>
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                <Card>
+                  <CardContent className="py-10 text-center">
+                    <p className="text-muted-foreground">You haven't created any projects yet</p>
+                    <Button className="mt-4" asChild>
+                      <Link to="/create-project">Start a new project</Link>
+                    </Button>
                   </CardContent>
                 </Card>
-              ))}
+              )}
             </TabsContent>
             
             <TabsContent value="drafts">

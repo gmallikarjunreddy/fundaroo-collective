@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -7,6 +6,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import { Pencil, Settings, ExternalLink } from 'lucide-react';
 import ProjectCard from '@/components/ProjectCard';
+import EditProjectDialog from '@/components/project/EditProjectDialog';
+import DeleteProjectDialog from '@/components/project/DeleteProjectDialog';
+import { useProjects } from '@/hooks/useProjects';
 
 // Mock user data
 const mockUser = {
@@ -70,6 +72,7 @@ const mockBackedProjects = [
 
 const UserProfile = () => {
   const { username } = useParams();
+  const { projects, isLoading, refreshProjects } = useProjects(true);
   const user = mockUser; // In a real app, fetch user by username
   const isCurrentUser = true; // In a real app, check if this is the logged-in user
 
@@ -127,10 +130,25 @@ const UserProfile = () => {
               </div>
             )}
             
-            {mockProjects.length > 0 ? (
+            {projects.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {mockProjects.map(project => (
-                  <ProjectCard key={project.id} {...project} />
+                {projects.map(project => (
+                  <div key={project._id}>
+                    <ProjectCard {...project} />
+                    {isCurrentUser && (
+                      <div className="mt-2 flex gap-2">
+                        <EditProjectDialog 
+                          project={project} 
+                          onUpdate={refreshProjects} 
+                        />
+                        <DeleteProjectDialog 
+                          projectId={project._id}
+                          projectTitle={project.title}
+                          onDelete={refreshProjects}
+                        />
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
             ) : (

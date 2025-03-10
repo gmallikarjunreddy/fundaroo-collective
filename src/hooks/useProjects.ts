@@ -1,9 +1,8 @@
-
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { getAllProjects } from '@/services/projectService';
+import { getAllProjects, getUserProjects } from '@/services/projectService';
 import { useState, useEffect } from 'react';
 
-export const useProjects = () => {
+export const useProjects = (userOnly: boolean = false) => {
   const [filteredProjects, setFilteredProjects] = useState([]);
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -12,29 +11,21 @@ export const useProjects = () => {
   const queryClient = useQueryClient();
 
   const { data: projects = [], isLoading, error } = useQuery({
-    queryKey: ['projects'],
-    queryFn: getAllProjects,
+    queryKey: userOnly ? ['userProjects'] : ['projects'],
+    queryFn: userOnly ? getUserProjects : getAllProjects,
     retry: 1,
     staleTime: 1000 * 60 * 5, // 5 minutes
-    meta: {
-      onError: (error: any) => {
-        console.error('Error fetching projects:', error);
-      }
-    }
   });
 
-  // Filter and sort projects based on activeCategory, searchQuery, and sortBy
   useEffect(() => {
     let result = [...projects];
     
-    // Filter by category
     if (activeCategory !== 'all') {
       result = result.filter(
         (project) => project.category === activeCategory
       );
     }
     
-    // Filter by search query
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       result = result.filter(
@@ -45,7 +36,6 @@ export const useProjects = () => {
       );
     }
     
-    // Sort projects
     switch (sortBy) {
       case 'newest':
         result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -77,6 +67,7 @@ export const useProjects = () => {
 
   const refreshProjects = () => {
     queryClient.invalidateQueries({ queryKey: ['projects'] });
+    queryClient.invalidateQueries({ queryKey: ['userProjects'] });
   };
 
   return {
