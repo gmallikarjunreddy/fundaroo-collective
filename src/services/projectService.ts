@@ -1,5 +1,5 @@
 
-import { mockProjects } from '@/utils/mockData';
+import { mockProjects as initialMockProjects } from '@/utils/mockData';
 import { toast } from 'sonner';
 
 // Interface for project data
@@ -34,6 +34,28 @@ export interface Project {
   backers: number;
   daysLeft: number;
 }
+
+// Load projects from localStorage or use the initial mock data
+const loadProjects = (): Project[] => {
+  const storedProjects = localStorage.getItem('fundaroo_projects');
+  if (storedProjects) {
+    try {
+      return JSON.parse(storedProjects);
+    } catch (error) {
+      console.error('Error parsing stored projects:', error);
+      return [...initialMockProjects];
+    }
+  }
+  return [...initialMockProjects];
+};
+
+// Save projects to localStorage
+const saveProjects = (projects: Project[]) => {
+  localStorage.setItem('fundaroo_projects', JSON.stringify(projects));
+};
+
+// Initialize the projects array
+let mockProjects = loadProjects();
 
 // Calculate days left for a project
 const calculateDaysLeft = (createdAt: string, duration: number): number => {
@@ -104,6 +126,9 @@ export const createProject = async (projectData: ProjectData): Promise<Project> 
   // In a real app, this would be saved to a database
   mockProjects.push(newProject);
   
+  // Save updated projects to localStorage
+  saveProjects(mockProjects);
+  
   toast.success("Project created successfully!");
   return newProject;
 };
@@ -126,6 +151,9 @@ export const updateProject = async (projectId: string, projectData: Partial<Proj
     coverImage: projectData.coverImage || mockProjects[projectIndex].coverImage
   };
   
+  // Save updated projects to localStorage
+  saveProjects(mockProjects);
+  
   toast.success("Project updated successfully!");
   return mockProjects[projectIndex];
 };
@@ -143,6 +171,9 @@ export const deleteProject = async (projectId: string): Promise<boolean> => {
   
   // Remove the project
   mockProjects.splice(projectIndex, 1);
+  
+  // Save updated projects to localStorage
+  saveProjects(mockProjects);
   
   toast.success("Project deleted successfully!");
   return true;
@@ -180,6 +211,9 @@ export const donateToProject = async (projectId: string, amount: number) => {
   
   // Increment backers count
   mockProjects[projectIndex].backers = (mockProjects[projectIndex].backers || 0) + 1;
+  
+  // Save updated projects to localStorage
+  saveProjects(mockProjects);
   
   console.log(`Updated project funding: ₹${mockProjects[projectIndex].raised}`);
   

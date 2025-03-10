@@ -15,6 +15,7 @@ export const useProjects = () => {
     queryKey: ['projects'],
     queryFn: getAllProjects,
     retry: 1,
+    staleTime: 1000 * 60 * 5, // 5 minutes
     meta: {
       onError: (error: any) => {
         console.error('Error fetching projects:', error);
