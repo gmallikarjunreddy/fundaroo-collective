@@ -24,6 +24,7 @@ interface DeleteProjectDialogProps {
 
 const DeleteProjectDialog = ({ projectId, projectTitle, onDelete }: DeleteProjectDialogProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -36,11 +37,12 @@ const DeleteProjectDialog = ({ projectId, projectTitle, onDelete }: DeleteProjec
       toast.error('Failed to delete project');
     } finally {
       setIsDeleting(false);
+      setIsOpen(false);
     }
   };
 
   return (
-    <AlertDialog>
+    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogTrigger asChild>
         <Button variant="outline" size="sm">
           <Trash2 className="h-4 w-4 mr-2" />

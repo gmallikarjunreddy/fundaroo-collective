@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Link } from 'react-router-dom';
@@ -20,27 +21,6 @@ const Dashboard = () => {
     followers: 86,
     projectViews: 1243
   };
-
-  const activeProjects = [
-    {
-      id: '101',
-      title: 'Eco-friendly Water Bottle',
-      raised: 12000,
-      goal: 15000,
-      daysLeft: 8,
-      backers: 248,
-      status: 'active'
-    },
-    {
-      id: '102',
-      title: 'Urban Garden Planter',
-      raised: 8000,
-      goal: 10000,
-      daysLeft: 12,
-      backers: 156,
-      status: 'active'
-    }
-  ];
 
   const recentActivities = [
     { id: 1, type: 'new_backer', project: 'Eco-friendly Water Bottle', user: 'Maria S.', amount: '$45', time: '2 hours ago' },
@@ -153,7 +133,13 @@ const Dashboard = () => {
             </TabsList>
             
             <TabsContent value="active">
-              {projects.length > 0 ? (
+              {isLoading ? (
+                <Card>
+                  <CardContent className="py-10 text-center">
+                    <p className="text-muted-foreground">Loading your projects...</p>
+                  </CardContent>
+                </Card>
+              ) : projects && projects.length > 0 ? (
                 projects.map(project => (
                   <Card key={project._id} className="mb-4">
                     <CardContent className="p-6">
@@ -165,9 +151,9 @@ const Dashboard = () => {
                           
                           <div className="mt-4 mb-2">
                             <ProjectProgress 
-                              projectId={project.id}
+                              projectId={project._id}
                               projectTitle={project.title}
-                              raised={project.raised} 
+                              raised={project.raised || 0} 
                               goal={project.goal} 
                             />
                           </div>
@@ -175,7 +161,7 @@ const Dashboard = () => {
                           <div className="flex flex-wrap gap-x-6 gap-y-2 mt-4 text-sm">
                             <div>
                               <span className="text-muted-foreground">Raised: </span>
-                              <span className="font-medium">₹{project.raised.toLocaleString()}</span>
+                              <span className="font-medium">₹{(project.raised || 0).toLocaleString()}</span>
                             </div>
                             <div>
                               <span className="text-muted-foreground">Goal: </span>
@@ -183,11 +169,11 @@ const Dashboard = () => {
                             </div>
                             <div>
                               <span className="text-muted-foreground">Backers: </span>
-                              <span className="font-medium">{project.backers}</span>
+                              <span className="font-medium">{project.backers || 0}</span>
                             </div>
                             <div>
                               <span className="text-muted-foreground">Days left: </span>
-                              <span className="font-medium">{project.daysLeft}</span>
+                              <span className="font-medium">{project.daysLeft || 0}</span>
                             </div>
                           </div>
                         </div>

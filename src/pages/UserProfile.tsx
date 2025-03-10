@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -25,34 +26,6 @@ const mockUser = {
     instagram: 'alexjohnson.design'
   }
 };
-
-// Mock projects data
-const mockProjects = [
-  {
-    id: '101',
-    title: 'Eco-friendly Water Bottle',
-    creator: 'Alex Johnson',
-    description: 'A sustainable water bottle that tracks your hydration and reduces plastic waste.',
-    imageSrc: 'https://images.unsplash.com/photo-1546518071-fddcdda7580a?q=80&w=800&auto=format&fit=crop',
-    category: 'Design',
-    raised: 12000,
-    goal: 15000,
-    daysLeft: 8,
-    featured: false
-  },
-  {
-    id: '102',
-    title: 'Urban Garden Planter',
-    creator: 'Alex Johnson',
-    description: 'Self-watering planter system for urban dwellers with limited space.',
-    imageSrc: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?q=80&w=800&auto=format&fit=crop',
-    category: 'Design',
-    raised: 8000,
-    goal: 10000,
-    daysLeft: 12,
-    featured: false
-  }
-];
 
 // Mock backed projects
 const mockBackedProjects = [
@@ -130,11 +103,27 @@ const UserProfile = () => {
               </div>
             )}
             
-            {projects.length > 0 ? (
+            {isLoading ? (
+              <Card>
+                <CardContent className="py-8 text-center">
+                  <p className="text-muted-foreground">Loading projects...</p>
+                </CardContent>
+              </Card>
+            ) : projects && projects.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {projects.map(project => (
-                  <div key={project._id}>
-                    <ProjectCard {...project} />
+                  <div key={project._id} className="flex flex-col h-full">
+                    <ProjectCard
+                      id={project._id}
+                      title={project.title}
+                      creator={project.creator?.name || "You"}
+                      description={project.description}
+                      imageSrc={project.coverImage}
+                      category={project.category}
+                      raised={project.raised || 0}
+                      goal={project.goal}
+                      daysLeft={project.daysLeft || 0}
+                    />
                     {isCurrentUser && (
                       <div className="mt-2 flex gap-2">
                         <EditProjectDialog 
@@ -155,6 +144,9 @@ const UserProfile = () => {
               <Card>
                 <CardContent className="py-8 text-center">
                   <p className="text-muted-foreground">No projects yet</p>
+                  <Button className="mt-4" asChild>
+                    <Link to="/create-project">Start a new project</Link>
+                  </Button>
                 </CardContent>
               </Card>
             )}
