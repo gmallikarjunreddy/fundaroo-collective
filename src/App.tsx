@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,6 +18,7 @@ const StartProject = lazy(() => import("./pages/StartProject"));
 const HowItWorks = lazy(() => import("./pages/HowItWorks"));
 const UserProfile = lazy(() => import("./pages/UserProfile"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
+const About = lazy(() => import("./pages/About"));
 
 // Configure QueryClient with performance optimizations
 const queryClient = new QueryClient({
@@ -82,6 +84,7 @@ const App = () => {
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Login />} />
+                <Route path="/about" element={<About />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>

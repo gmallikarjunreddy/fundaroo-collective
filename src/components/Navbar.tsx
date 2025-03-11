@@ -81,6 +81,12 @@ const Navbar = () => {
             How It Works
           </Link>
           <Link 
+            to="/about" 
+            className="px-4 py-2 text-foreground/80 hover:text-foreground transition-colors"
+          >
+            About Us
+          </Link>
+          <Link 
             to="/start-project" 
             className="px-4 py-2 text-foreground/80 hover:text-foreground transition-colors"
           >
@@ -178,13 +184,19 @@ const Navbar = () => {
                 How It Works
               </Link>
               <Link 
+                to="/about" 
+                className="px-4 py-3 hover:bg-gray-50 rounded-md"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                About Us
+              </Link>
+              <Link 
                 to="/start-project" 
                 className="px-4 py-3 hover:bg-gray-50 rounded-md"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Start a Project
               </Link>
-              <div className="h-px bg-border my-2"></div>
               
               {isAuthenticated ? (
                 <>
