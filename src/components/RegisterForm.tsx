@@ -1,16 +1,15 @@
-
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { registerUser } from '@/utils/auth';
 
 const RegisterForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const { toast } = useToast();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -30,28 +29,22 @@ const RegisterForm = () => {
     
     // Basic validation
     if (!formData.fullName || !formData.email || !formData.password) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill out all required fields.",
-        variant: "destructive"
+      toast.error("Missing Information", {
+        description: "Please fill out all required fields."
       });
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      toast({
-        title: "Passwords Don't Match",
-        description: "Please ensure your passwords match.",
-        variant: "destructive"
+      toast.error("Passwords Don't Match", {
+        description: "Please ensure your passwords match."
       });
       return;
     }
 
     if (formData.password.length < 8) {
-      toast({
-        title: "Password Too Short",
-        description: "Your password must be at least 8 characters long.",
-        variant: "destructive"
+      toast.error("Password Too Short", {
+        description: "Your password must be at least 8 characters long."
       });
       return;
     }
@@ -59,43 +52,27 @@ const RegisterForm = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/users/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          fullName: formData.fullName,
-          email: formData.email,
-          password: formData.password,
-        }),
+      await registerUser({
+        name: formData.fullName,
+        email: formData.email,
+        password: formData.password,
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Registration failed');
-      }
-
-      toast({
-        title: "Account created!",
-        description: "Welcome to Fundaroo. Please log in now.",
+      toast.success("Account created!", {
+        description: "Welcome to Fundaroo. Please log in now."
       });
       
       // After registration, check if there's a pending project and prompt them to log in
       if (localStorage.getItem('pendingProject')) {
-        toast({
-          title: "Project Creation Pending",
-          description: "Please log in to continue creating your project.",
+        toast.info("Project Creation Pending", {
+          description: "Please log in to continue creating your project."
         });
       }
       
       navigate('/login');
     } catch (error) {
-      toast({
-        title: "Registration Failed",
-        description: error instanceof Error ? error.message : "An unexpected error occurred",
-        variant: "destructive"
+      toast.error("Registration Failed", {
+        description: error instanceof Error ? error.message : "An unexpected error occurred"
       });
     } finally {
       setIsLoading(false);

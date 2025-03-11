@@ -26,19 +26,53 @@ export const getToken = () => {
   return userInfo?.token || null;
 };
 
+// Helper to get registered users from localStorage
+const getRegisteredUsers = () => {
+  const registeredUsersString = localStorage.getItem('registeredUsers');
+  if (!registeredUsersString) return [];
+  
+  try {
+    return JSON.parse(registeredUsersString);
+  } catch (e) {
+    console.error('Error parsing registered users from localStorage', e);
+    return [];
+  }
+};
+
 // Login user
 export const loginUser = async (email: string, password: string) => {
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 800));
 
-  // For demo, just check if email contains "demo" and password isn't empty
+  // Check if the user is registered
+  const registeredUsers = getRegisteredUsers();
+  const registeredUser = registeredUsers.find(
+    (user: any) => user.email === email && user.password === password
+  );
+
+  if (registeredUser) {
+    // Create a sanitized user object (remove password)
+    const userToStore = {
+      _id: registeredUser._id,
+      name: registeredUser.name || registeredUser.fullName,
+      email: registeredUser.email,
+      token: `user-token-${Date.now()}`,
+      isAdmin: registeredUser.isAdmin || false
+    };
+    
+    // Save user data to localStorage
+    localStorage.setItem('userInfo', JSON.stringify(userToStore));
+    return userToStore;
+  }
+  
+  // Fallback for demo users
   if (email.includes('demo') && password.length > 0) {
     // Save user data to localStorage
     localStorage.setItem('userInfo', JSON.stringify(mockUser));
     return mockUser;
-  } else {
-    throw new Error('Invalid email or password. Try using an email with "demo".');
   }
+  
+  throw new Error('Invalid email or password. Try using an email with "demo" or sign up first.');
 };
 
 // Register user
@@ -46,17 +80,40 @@ export const registerUser = async (userData: { name: string; email: string; pass
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 1000));
 
-  // For demo, just create a new user with the provided data
+  // Check if user already exists
+  const registeredUsers = getRegisteredUsers();
+  const userExists = registeredUsers.some(
+    (user: any) => user.email === userData.email
+  );
+
+  if (userExists) {
+    throw new Error('User with this email already exists');
+  }
+
+  // Create a new user with a unique ID
   const newUser = {
-    ...mockUser,
+    _id: `user-${Date.now()}`,
+    fullName: userData.name,
     name: userData.name,
-    email: userData.email
+    email: userData.email,
+    password: userData.password, // In a real app, this would be hashed
+    isAdmin: false,
+    createdAt: new Date().toISOString()
   };
   
-  // Save user data to localStorage
-  localStorage.setItem('userInfo', JSON.stringify(newUser));
+  // Save to registered users in localStorage
+  localStorage.setItem('registeredUsers', JSON.stringify([...registeredUsers, newUser]));
   
-  return newUser;
+  // Return a sanitized user object (without password)
+  const userToReturn = {
+    _id: newUser._id,
+    name: newUser.name,
+    email: newUser.email,
+    token: `user-token-${Date.now()}`,
+    isAdmin: newUser.isAdmin
+  };
+  
+  return userToReturn;
 };
 
 // Logout user
