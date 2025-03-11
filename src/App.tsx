@@ -19,6 +19,8 @@ const HowItWorks = lazy(() => import("./pages/HowItWorks"));
 const UserProfile = lazy(() => import("./pages/UserProfile"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const About = lazy(() => import("./pages/About"));
+const MyProjects = lazy(() => import("./pages/MyProjects"));
+const UserSettings = lazy(() => import("./pages/UserSettings"));
 
 // Configure QueryClient with performance optimizations
 const queryClient = new QueryClient({
@@ -76,11 +78,13 @@ const App = () => {
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/projects" element={<Projects />} />
+                <Route path="/projects/my-projects" element={<MyProjects />} />
                 <Route path="/project/:id" element={<ProjectDetails />} />
                 <Route path="/create-project" element={<CreateProject />} />
                 <Route path="/start-project" element={<StartProject />} />
                 <Route path="/how-it-works" element={<HowItWorks />} />
                 <Route path="/profile/:username" element={<UserProfile />} />
+                <Route path="/user/settings" element={<UserSettings />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Login />} />

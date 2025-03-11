@@ -120,13 +120,13 @@ const Navbar = () => {
                   <Link to="/dashboard">Dashboard</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/profile">Profile</Link>
+                  <Link to={`/profile/${user?.username || user?._id}`}>Profile</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/my-projects">My Projects</Link>
+                  <Link to="/projects/my-projects">My Projects</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/settings">
+                  <Link to="/user/settings">
                     <Settings className="mr-2 h-4 w-4" />
                     Settings
                   </Link>
@@ -208,18 +208,25 @@ const Navbar = () => {
                     Dashboard
                   </Link>
                   <Link 
-                    to="/profile" 
+                    to={`/profile/${user?.username || user?._id}`}
                     className="px-4 py-3 hover:bg-gray-50 rounded-md"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Profile
                   </Link>
                   <Link 
-                    to="/my-projects" 
+                    to="/projects/my-projects" 
                     className="px-4 py-3 hover:bg-gray-50 rounded-md"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     My Projects
+                  </Link>
+                  <Link 
+                    to="/user/settings" 
+                    className="px-4 py-3 hover:bg-gray-50 rounded-md"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Settings
                   </Link>
                   <button 
                     className="px-4 py-3 text-left text-red-500 hover:bg-gray-50 rounded-md"
