@@ -1,6 +1,7 @@
 
 import { mockProjects as initialMockProjects } from '@/utils/mockData';
 import { toast } from 'sonner';
+import { getUserInfo } from '@/utils/auth';
 
 // Interface for project data
 export interface ProjectData {
@@ -27,6 +28,7 @@ export interface Project {
   creator: { 
     name: string; 
     fullName: string;
+    _id?: string;
   };
   raised: number;
   featured: boolean;
@@ -110,12 +112,22 @@ export const createProject = async (projectData: ProjectData): Promise<Project> 
   
   console.log('Creating project with data:', projectData);
   
-  // Create a new project with mock data
+  // Get current user info
+  const userInfo = getUserInfo();
+  if (!userInfo) {
+    throw new Error('You must be logged in to create a project');
+  }
+  
+  // Create a new project with user data
   const newProject: Project = {
-    _id: `new-${Date.now()}`,
+    _id: `project-${Date.now()}`,
     ...projectData,
     coverImage: projectData.coverImage || 'https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=800&auto=format&fit=crop', // Default image if not provided
-    creator: { name: 'Demo User', fullName: 'Demo User' },
+    creator: { 
+      name: userInfo.name, 
+      fullName: userInfo.name,
+      _id: userInfo._id 
+    },
     raised: 0,
     featured: false,
     createdAt: new Date().toISOString(),
@@ -184,8 +196,24 @@ export const getUserProjects = async (): Promise<Project[]> => {
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 500));
   
-  // For demo purposes, return the first 2 projects as user projects
-  return mockProjects.slice(0, 2).map(project => ({
+  // Get current user info
+  const userInfo = getUserInfo();
+  console.log('Getting user projects for:', userInfo);
+  
+  if (!userInfo) {
+    console.warn('No user info found when getting user projects');
+    return [];
+  }
+  
+  // Filter projects by creator ID
+  const userProjects = mockProjects.filter(project => 
+    project.creator?._id === userInfo._id
+  );
+  
+  console.log('User projects found:', userProjects.length);
+  
+  // Return projects with backers and daysLeft
+  return userProjects.map(project => ({
     ...project,
     backers: project.backers || Math.floor(Math.random() * 200) + 5,
     daysLeft: project.daysLeft || calculateDaysLeft(project.createdAt, project.duration)

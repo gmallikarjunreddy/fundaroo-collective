@@ -7,11 +7,13 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { loginUser } from '@/utils/auth';
+import { useUser } from '@/context/UserContext';
 
 const LoginForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const { login } = useUser();
 
   const [formData, setFormData] = useState({
     email: '',
@@ -37,7 +39,10 @@ const LoginForm = () => {
     setIsLoading(true);
 
     try {
-      await loginUser(formData.email, formData.password);
+      const userData = await loginUser(formData.email, formData.password);
+      
+      // Update user context
+      login(userData);
 
       toast.success("Login successful!", {
         description: "Welcome back to Fundaroo."

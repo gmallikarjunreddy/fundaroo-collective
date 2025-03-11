@@ -2,12 +2,14 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getAllProjects, getUserProjects } from '@/services/projectService';
 import { useState, useEffect } from 'react';
+import { useUser } from '@/context/UserContext';
 
 export const useProjects = (userOnly: boolean = false) => {
   const [filteredProjects, setFilteredProjects] = useState([]);
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('newest');
+  const { isAuthenticated } = useUser();
 
   const queryClient = useQueryClient();
 
@@ -16,6 +18,14 @@ export const useProjects = (userOnly: boolean = false) => {
     queryFn: userOnly ? getUserProjects : getAllProjects,
     retry: 1,
     staleTime: 1000 * 60 * 5, // 5 minutes
+    enabled: !userOnly || isAuthenticated, // Only run user projects query if authenticated
+  });
+
+  console.log('useProjects hook:', { 
+    userOnly, 
+    isAuthenticated, 
+    projectCount: projects.length,
+    projects
   });
 
   useEffect(() => {
@@ -23,14 +33,14 @@ export const useProjects = (userOnly: boolean = false) => {
     
     if (activeCategory !== 'all') {
       result = result.filter(
-        (project) => project.category === activeCategory
+        (project: any) => project.category === activeCategory
       );
     }
     
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       result = result.filter(
-        (project) =>
+        (project: any) =>
           project.title.toLowerCase().includes(query) ||
           project.description.toLowerCase().includes(query) ||
           project.creator?.name?.toLowerCase().includes(query)
@@ -39,10 +49,10 @@ export const useProjects = (userOnly: boolean = false) => {
     
     switch (sortBy) {
       case 'newest':
-        result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        result.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         break;
       case 'endingSoon':
-        result.sort((a, b) => {
+        result.sort((a: any, b: any) => {
           const endDateA = new Date(a.createdAt);
           endDateA.setDate(endDateA.getDate() + Number(a.duration));
           
@@ -53,7 +63,7 @@ export const useProjects = (userOnly: boolean = false) => {
         });
         break;
       case 'mostFunded':
-        result.sort((a, b) => {
+        result.sort((a: any, b: any) => {
           const percentA = a.raised ? (a.raised / a.goal) * 100 : 0;
           const percentB = b.raised ? (b.raised / b.goal) * 100 : 0;
           return percentB - percentA;

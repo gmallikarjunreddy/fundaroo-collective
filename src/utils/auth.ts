@@ -44,13 +44,19 @@ export const loginUser = async (email: string, password: string) => {
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 800));
 
+  console.log('Attempting login with:', email);
+  
   // Check if the user is registered
   const registeredUsers = getRegisteredUsers();
+  console.log('Registered users:', registeredUsers);
+  
   const registeredUser = registeredUsers.find(
     (user: any) => user.email === email && user.password === password
   );
 
   if (registeredUser) {
+    console.log('Found registered user:', registeredUser);
+    
     // Create a sanitized user object (remove password)
     const userToStore = {
       _id: registeredUser._id,
@@ -80,6 +86,8 @@ export const registerUser = async (userData: { name: string; email: string; pass
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 1000));
 
+  console.log('Registering user:', userData.email);
+
   // Check if user already exists
   const registeredUsers = getRegisteredUsers();
   const userExists = registeredUsers.some(
@@ -101,8 +109,12 @@ export const registerUser = async (userData: { name: string; email: string; pass
     createdAt: new Date().toISOString()
   };
   
+  console.log('Created new user:', newUser);
+  
   // Save to registered users in localStorage
-  localStorage.setItem('registeredUsers', JSON.stringify([...registeredUsers, newUser]));
+  const updatedUsers = [...registeredUsers, newUser];
+  localStorage.setItem('registeredUsers', JSON.stringify(updatedUsers));
+  console.log('Updated registered users:', updatedUsers);
   
   // Return a sanitized user object (without password)
   const userToReturn = {
@@ -112,6 +124,9 @@ export const registerUser = async (userData: { name: string; email: string; pass
     token: `user-token-${Date.now()}`,
     isAdmin: newUser.isAdmin
   };
+  
+  // Also log the user in (store in localStorage)
+  localStorage.setItem('userInfo', JSON.stringify(userToReturn));
   
   return userToReturn;
 };

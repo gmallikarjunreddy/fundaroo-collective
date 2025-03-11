@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -6,11 +7,13 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { registerUser } from '@/utils/auth';
+import { useUser } from '@/context/UserContext';
 
 const RegisterForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const { login } = useUser();
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -52,24 +55,28 @@ const RegisterForm = () => {
     setIsLoading(true);
 
     try {
-      await registerUser({
+      const userData = await registerUser({
         name: formData.fullName,
         email: formData.email,
         password: formData.password,
       });
+      
+      // Update user context
+      login(userData);
 
       toast.success("Account created!", {
-        description: "Welcome to Fundaroo. Please log in now."
+        description: "Welcome to Fundaroo! You are now logged in."
       });
       
-      // After registration, check if there's a pending project and prompt them to log in
+      // After registration, check if there's a pending project
       if (localStorage.getItem('pendingProject')) {
         toast.info("Project Creation Pending", {
-          description: "Please log in to continue creating your project."
+          description: "You'll be redirected to continue creating your project."
         });
+        navigate('/create-project');
+      } else {
+        navigate('/dashboard');
       }
-      
-      navigate('/login');
     } catch (error) {
       toast.error("Registration Failed", {
         description: error instanceof Error ? error.message : "An unexpected error occurred"
